@@ -1,0 +1,532 @@
+{
+  "module": "M2",
+  "title": "Senilai atau Berbalik?",
+  "evidence": [
+    "K03",
+    "IL01",
+    "IL02",
+    "EL02",
+    "EL04",
+    "DS02"
+  ],
+  "screens": [
+    {
+      "id": "M2-01",
+      "text": [
+        "Senilai dan berbalik nilai sama-sama membandingkan dua besaran.",
+        "Bedanya ada pada **arah perubahannya**.",
+        "[[senilai]]   [[berbalik]]"
+      ],
+      "evidence": [
+        "IL01"
+      ]
+    },
+    {
+      "id": "M2-02",
+      "text": [
+        "Harga satuan buku sama, Rp4.000. Jika buku bertambah, harga bertambah."
+      ],
+      "tables": [
+        {
+          "columns": [
+            {
+              "label": "Buku",
+              "arrow": "↑"
+            },
+            {
+              "label": "Harga (Rp)",
+              "arrow": "↑"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              4000
+            ],
+            [
+              2,
+              8000
+            ],
+            [
+              4,
+              16000
+            ]
+          ]
+        }
+      ],
+      "after": [
+        "Ini perbandingan [[senilai]]."
+      ],
+      "evidence": [
+        "K01",
+        "GL01",
+        "EL02"
+      ]
+    },
+    {
+      "id": "M2-03",
+      "text": [
+        "Bagi harga dengan banyak buku. Hasilnya selalu sama."
+      ],
+      "tables": [
+        {
+          "columns": [
+            {
+              "label": "Buku"
+            },
+            {
+              "label": "Harga (Rp)"
+            },
+            {
+              "label": "Harga : Buku"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              4000,
+              4000
+            ],
+            [
+              2,
+              8000,
+              4000
+            ],
+            [
+              4,
+              16000,
+              4000
+            ]
+          ],
+          "check": "quotient"
+        }
+      ],
+      "after": [
+        "Pada senilai, **hasil bagi** tetap."
+      ]
+    },
+    {
+      "id": "M2-04",
+      "text": [
+        "Pagar yang sama dicat oleh beberapa pekerja. Jika pekerja bertambah, pagar selesai lebih cepat. Harinya berkurang."
+      ],
+      "tables": [
+        {
+          "columns": [
+            {
+              "label": "Pekerja",
+              "arrow": "↑"
+            },
+            {
+              "label": "Hari",
+              "arrow": "↓"
+            }
+          ],
+          "rows": [
+            [
+              2,
+              12
+            ],
+            [
+              4,
+              6
+            ],
+            [
+              6,
+              4
+            ]
+          ]
+        }
+      ],
+      "after": [
+        "Ini perbandingan [[berbalik]]."
+      ],
+      "evidence": [
+        "IL04",
+        "EL02"
+      ]
+    },
+    {
+      "id": "M2-05",
+      "text": [
+        "Kalikan pekerja dengan hari. Hasilnya selalu sama."
+      ],
+      "tables": [
+        {
+          "columns": [
+            {
+              "label": "Pekerja"
+            },
+            {
+              "label": "Hari"
+            },
+            {
+              "label": "Pekerja × Hari"
+            }
+          ],
+          "rows": [
+            [
+              2,
+              12,
+              24
+            ],
+            [
+              4,
+              6,
+              24
+            ],
+            [
+              6,
+              4,
+              24
+            ]
+          ],
+          "check": "product"
+        }
+      ],
+      "after": [
+        "Pada berbalik nilai, **hasil kali** tetap."
+      ]
+    },
+    {
+      "id": "M2-06",
+      "text": [
+        "Bandingkan kedua tabel."
+      ],
+      "tables": [
+        {
+          "caption": "SENILAI ↑↑",
+          "columns": [
+            {
+              "label": "Buku",
+              "arrow": "↑"
+            },
+            {
+              "label": "Harga",
+              "arrow": "↑"
+            }
+          ],
+          "rows": [
+            [
+              2,
+              8000
+            ],
+            [
+              4,
+              16000
+            ]
+          ],
+          "answer": {
+            "jenis": "senilai",
+            "tetap": "hasil bagi"
+          }
+        },
+        {
+          "caption": "BERBALIK ↑↓",
+          "columns": [
+            {
+              "label": "Pekerja",
+              "arrow": "↑"
+            },
+            {
+              "label": "Hari",
+              "arrow": "↓"
+            }
+          ],
+          "rows": [
+            [
+              2,
+              12
+            ],
+            [
+              4,
+              6
+            ]
+          ],
+          "answer": {
+            "jenis": "berbalik",
+            "tetap": "hasil kali"
+          }
+        }
+      ],
+      "after": [
+        "Jika yang satu bertambah, yang lain **bertambah** atau **berkurang**?"
+      ],
+      "evidence": [
+        "IL01",
+        "K03",
+        "DS02"
+      ],
+      "interaction": {
+        "type": "label_tables",
+        "prompt": "Ketuk jenisnya di bawah tiap tabel.",
+        "constantQuestion": "Yang tetap: hasil bagi atau hasil kali?",
+        "constantOptions": [
+          "hasil bagi",
+          "hasil kali"
+        ],
+        "feedback": {
+          "jenisOk": "Tepat!",
+          "jenisErr": "Belum tepat. Lihat panah kedua kolom.",
+          "tetapOk": "Tepat!",
+          "tetapErr": "Belum tepat. Bagi dan kalikan angka satu baris. Mana yang sama?"
+        }
+      }
+    },
+    {
+      "id": "M2-07",
+      "text": [
+        "1. Tentukan dua besaran.",
+        "2. Bayangkan besaran pertama bertambah.",
+        "3. Besaran kedua ikut bertambah → [[senilai]] (hasil bagi tetap).",
+        "4. Besaran kedua berkurang → [[berbalik]] (hasil kali tetap)."
+      ],
+      "note": "Kartu ini bisa dibuka lagi dari tombol \"Ingat lagi\" saat mengerjakan soal.",
+      "evidence": [
+        "EL04"
+      ]
+    }
+  ],
+  "identify": [
+    {
+      "id": "I1",
+      "text": "Mobil yang sama memakai bensin untuk perjalanan. Makin banyak bensin, makin jauh jarak tempuhnya?",
+      "a": "bensin",
+      "b": "jarak tempuh",
+      "condition": "mobil dan pemakaian bensin sama",
+      "arah": "searah",
+      "jenis": "senilai",
+      "hints": [
+        "Jika bensinnya lebih banyak, mobil bisa berjalan lebih jauh atau lebih dekat?",
+        "Bensin bertambah, jarak bertambah. Lihat kartu ↑↑."
+      ]
+    },
+    {
+      "id": "I2",
+      "text": "Persediaan pakan cukup untuk beberapa ayam. Jika ayamnya bertambah, pakan habis dalam berapa hari?",
+      "a": "banyak ayam",
+      "b": "lama pakan habis",
+      "condition": "banyak pakan sama",
+      "arah": "berlawanan",
+      "jenis": "berbalik",
+      "hints": [
+        "Jika ayamnya lebih banyak, apakah pakan dimakan lebih banyak setiap hari?",
+        "Ayam bertambah, hari berkurang. Lihat kartu ↑↓."
+      ]
+    },
+    {
+      "id": "I3",
+      "text": "Jarak rumah ke kota sama. Jika kecepatan motor bertambah, bagaimana waktu tempuhnya?",
+      "a": "kecepatan",
+      "b": "waktu tempuh",
+      "condition": "jarak sama",
+      "arah": "berlawanan",
+      "jenis": "berbalik",
+      "hints": [
+        "Jika motor lebih cepat, sampainya lebih cepat atau lebih lama?",
+        "Kecepatan bertambah, waktu berkurang. Lihat kartu ↑↓."
+      ]
+    },
+    {
+      "id": "I4",
+      "text": "Membuat kue dengan resep yang sama. Jika kue yang dibuat bertambah, bagaimana tepung yang dibutuhkan?",
+      "a": "banyak kue",
+      "b": "tepung",
+      "condition": "resep sama",
+      "arah": "searah",
+      "jenis": "senilai",
+      "hints": [
+        "Jika kuenya lebih banyak, tepungnya lebih banyak atau lebih sedikit?",
+        "Kue bertambah, tepung bertambah. Lihat kartu ↑↑."
+      ]
+    },
+    {
+      "id": "I5",
+      "text": "Satu kue besar dibagi rata. Jika anak yang mendapat bagian bertambah, bagaimana bagian tiap anak?",
+      "a": "banyak anak",
+      "b": "bagian tiap anak",
+      "condition": "kue sama",
+      "arah": "berlawanan",
+      "jenis": "berbalik",
+      "hints": [
+        "Jika anaknya lebih banyak, bagian tiap anak lebih besar atau lebih kecil?",
+        "Anak bertambah, bagian berkurang. Lihat kartu ↑↓."
+      ]
+    }
+  ],
+  "check": [
+    {
+      "id": "C1",
+      "text": "Harga satuan buku tulis sama. Bagaimana hubungan banyak buku tulis dan harga yang dibayar?",
+      "a": "banyak buku tulis",
+      "b": "harga yang dibayar",
+      "condition": "harga satuan sama",
+      "arah": "searah",
+      "jenis": "senilai",
+      "hints": [
+        "Jika buku tulisnya lebih banyak, uang yang dibayar lebih banyak atau lebih sedikit?"
+      ]
+    },
+    {
+      "id": "C2",
+      "text": "Bak mandi yang sama diisi beberapa keran yang sama besar. Bagaimana hubungan banyak keran dan lama mengisi bak?",
+      "a": "banyak keran",
+      "b": "lama mengisi bak",
+      "condition": "bak sama",
+      "arah": "berlawanan",
+      "jenis": "berbalik",
+      "hints": [
+        "Jika kerannya lebih banyak, bak penuh lebih cepat atau lebih lama?"
+      ]
+    },
+    {
+      "id": "C3",
+      "text": "Orang berjalan dengan kecepatan tetap. Bagaimana hubungan lama berjalan dan jarak yang ditempuh?",
+      "a": "lama berjalan",
+      "b": "jarak",
+      "condition": "kecepatan tetap",
+      "arah": "searah",
+      "jenis": "senilai",
+      "hints": [
+        "Jika berjalan lebih lama, jaraknya lebih jauh atau lebih dekat?"
+      ]
+    },
+    {
+      "id": "C4",
+      "text": "Rumah yang sama dibangun beberapa tukang. Bagaimana hubungan banyak tukang dan lama membangun?",
+      "a": "banyak tukang",
+      "b": "lama membangun",
+      "condition": "rumah sama",
+      "arah": "berlawanan",
+      "jenis": "berbalik",
+      "hints": [
+        "Jika tukangnya lebih banyak, rumah selesai lebih cepat atau lebih lama?"
+      ]
+    },
+    {
+      "id": "C5",
+      "text": "Cat yang sama dipakai untuk mengecat dinding. Bagaimana hubungan banyak liter cat dan luas dinding yang dicat?",
+      "a": "liter cat",
+      "b": "luas dinding",
+      "condition": "cat sama",
+      "arah": "searah",
+      "jenis": "senilai",
+      "hints": [
+        "Jika catnya lebih banyak, dinding yang dicat lebih luas atau lebih sempit?"
+      ]
+    }
+  ],
+  "quick": [
+    {
+      "id": "Q1",
+      "text": "Mencetak 1.000 lembar dengan beberapa mesin fotokopi yang sama. Bagaimana hubungan banyak mesin dan lama mencetak?",
+      "a": "banyak mesin",
+      "b": "lama mencetak",
+      "condition": "pesanan sama",
+      "arah": "berlawanan",
+      "jenis": "berbalik",
+      "hints": []
+    },
+    {
+      "id": "Q2",
+      "text": "Resep kue yang sama. Bagaimana hubungan banyak telur dan banyak kue?",
+      "a": "banyak telur",
+      "b": "banyak kue",
+      "condition": "resep sama",
+      "arah": "searah",
+      "jenis": "senilai",
+      "hints": []
+    },
+    {
+      "id": "Q3",
+      "text": "30 siswa dibagi rata ke beberapa kelompok. Bagaimana hubungan banyak kelompok dan banyak anggota per kelompok?",
+      "a": "banyak kelompok",
+      "b": "anggota per kelompok",
+      "condition": "jumlah siswa sama",
+      "arah": "berlawanan",
+      "jenis": "berbalik",
+      "hints": []
+    },
+    {
+      "id": "Q4",
+      "text": "Tarif ojek per km sama. Bagaimana hubungan jarak dan ongkos?",
+      "a": "jarak",
+      "b": "ongkos",
+      "condition": "tarif per km sama",
+      "arah": "searah",
+      "jenis": "senilai",
+      "hints": []
+    },
+    {
+      "id": "Q5",
+      "text": "Jarak rumah ke sekolah sama. Bagaimana hubungan kecepatan sepeda dan waktu sampai sekolah?",
+      "a": "kecepatan sepeda",
+      "b": "waktu sampai",
+      "condition": "jarak sama",
+      "arah": "berlawanan",
+      "jenis": "berbalik",
+      "hints": []
+    }
+  ],
+  "passScore": 4,
+  "explain": {
+    "id": "M2-10",
+    "prompt": "Temanmu bertanya: \"Kenapa soal pekerja dan hari itu berbalik nilai?\" Bantu dia menjawab.",
+    "cloze": [
+      "Soal itu",
+      {
+        "key": "jenis",
+        "options": [
+          "senilai",
+          "berbalik nilai"
+        ]
+      },
+      "karena jika",
+      {
+        "key": "besaran1",
+        "options": [
+          "pekerja",
+          "hari"
+        ]
+      },
+      "bertambah,",
+      {
+        "key": "besaran2",
+        "options": [
+          "pekerja",
+          "hari"
+        ]
+      },
+      {
+        "key": "arah",
+        "options": [
+          "bertambah",
+          "berkurang"
+        ]
+      },
+      ". Yang tetap adalah",
+      {
+        "key": "tetap",
+        "options": [
+          "hasil bagi",
+          "hasil kali"
+        ]
+      },
+      "."
+    ],
+    "expected": {
+      "jenis": "berbalik nilai",
+      "besaran1": "pekerja",
+      "besaran2": "hari",
+      "arah": "berkurang",
+      "tetap": "hasil kali"
+    },
+    "example": "Berbalik nilai. Kalau pekerjanya ditambah, pagar cepat selesai, jadi harinya berkurang. Pekerja × hari selalu 24.",
+    "checklist": [
+      "Aku menyebut jenisnya dengan benar.",
+      "Aku menyebut arah perubahan kedua besaran.",
+      "Aku menyebut yang tetap (hasil bagi atau hasil kali)."
+    ]
+  },
+  "closing": "Kamu sudah bisa membedakan senilai dan berbalik nilai. Berikutnya kita mulai menghitung, mulai dari senilai."
+}

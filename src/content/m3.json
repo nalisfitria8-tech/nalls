@@ -1,0 +1,632 @@
+{
+  "module": "M3",
+  "title": "Menghitung Senilai",
+  "evidence": [
+    "GL01",
+    "IL02",
+    "EL02",
+    "EL04",
+    "IL05",
+    "GL02"
+  ],
+  "screens": [
+    {
+      "id": "M3-01",
+      "text": [
+        "Ada dua cara menghitung senilai. Hasilnya sama."
+      ],
+      "tables": [
+        {
+          "columns": [
+            {
+              "label": "Cara"
+            },
+            {
+              "label": "3 buku Rp12.000, harga 5 buku?"
+            }
+          ],
+          "rows": [
+            [
+              "Nilai satuan",
+              "12.000 : 3 = 4.000 → 4.000 × 5 = 20.000"
+            ],
+            [
+              "Perbandingan",
+              "3/12.000 = 5/? → ? = 12.000 × 5 : 3 = 20.000"
+            ]
+          ]
+        }
+      ],
+      "after": [
+        "Di aplikasi, kita pakai 4 langkah."
+      ]
+    },
+    {
+      "id": "M3-02",
+      "text": [
+        "① Diketahui → ② Ditanya → ③ Jenis → ④ Hitung",
+        "Langkah 3 tidak boleh dilewati. Jenisnya menentukan cara menghitung."
+      ],
+      "evidence": [
+        "IL02"
+      ]
+    },
+    {
+      "id": "M3-E1-1",
+      "text": [
+        "**Contoh.** Bu Sari membeli 3 buku seharga Rp12.000. Berapa harga 5 buku yang sama?",
+        "**① Diketahui.** Angka yang penting dipindah ke tabel."
+      ],
+      "tables": [
+        {
+          "columns": [
+            {
+              "label": "Buku"
+            },
+            {
+              "label": "Harga (Rp)"
+            }
+          ],
+          "rows": [
+            [
+              3,
+              12000
+            ],
+            [
+              5,
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M3-E1-2",
+      "text": [
+        "**② Ditanya:** harga 5 buku (tanda ?)."
+      ],
+      "tables": [
+        {
+          "columns": [
+            {
+              "label": "Buku"
+            },
+            {
+              "label": "Harga (Rp)"
+            }
+          ],
+          "rows": [
+            [
+              3,
+              12000
+            ],
+            [
+              5,
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M3-E1-3",
+      "text": [
+        "**③ Jenis.** Buku bertambah (3 → 5). Harga satuan sama, jadi harga bertambah."
+      ],
+      "tables": [
+        {
+          "columns": [
+            {
+              "label": "Buku",
+              "arrow": "↑"
+            },
+            {
+              "label": "Harga (Rp)",
+              "arrow": "↑"
+            }
+          ],
+          "rows": [
+            [
+              3,
+              12000
+            ],
+            [
+              5,
+              null
+            ]
+          ]
+        }
+      ],
+      "after": [
+        "Jadi [[senilai]]."
+      ]
+    },
+    {
+      "id": "M3-E1-4",
+      "text": [
+        "**④ Hitung.** Senilai → hasil bagi tetap.",
+        "3/12.000 = 5/?  →  ? = 12.000 × 5 : 3 = **20.000**"
+      ],
+      "tables": [
+        {
+          "columns": [
+            {
+              "label": "Buku"
+            },
+            {
+              "label": "Harga (Rp)"
+            }
+          ],
+          "rows": [
+            [
+              3,
+              12000
+            ],
+            [
+              5,
+              20000
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M3-E1-5",
+      "text": [
+        "**Cek.** Buku bertambah, harga bertambah. 20.000 lebih besar dari 12.000. Masuk akal ✔",
+        "Sekarang giliranmu."
+      ],
+      "evidence": [
+        "GL02"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "M3-E2",
+      "phase": "setengah",
+      "type": "senilai",
+      "context": "bensin-jarak",
+      "text": "Mobil memakai 2 liter bensin untuk 30 km. Berapa km dengan 5 liter?",
+      "marks": {
+        "relevant": [
+          "2",
+          "30",
+          "5"
+        ],
+        "distractors": [],
+        "question": "Berapa km dengan 5 liter?"
+      },
+      "table": {
+        "columns": [
+          "Bensin (L)",
+          "Jarak (km)"
+        ],
+        "rows": [
+          [
+            2,
+            30
+          ],
+          [
+            5,
+            null
+          ]
+        ]
+      },
+      "answer": 75,
+      "swappedAnswer": 12,
+      "prefilled": [
+        "diketahui",
+        "ditanya",
+        "jenis"
+      ],
+      "hints": [
+        "Bensin lebih banyak, jaraknya lebih jauh atau lebih dekat?",
+        "Senilai: hasil bagi tetap. 1 liter = 30 : 2 km.",
+        "1 liter = 15 km. Jadi 5 liter = 15 × 5."
+      ],
+      "twin": {
+        "text": "Mobil memakai 3 liter bensin untuk 36 km. Berapa km dengan 5 liter?",
+        "rows": [
+          [
+            3,
+            36
+          ],
+          [
+            5,
+            null
+          ]
+        ],
+        "answer": 60
+      }
+    },
+    {
+      "id": "M3-E3",
+      "phase": "setengah",
+      "type": "senilai",
+      "context": "tepung-kue",
+      "text": "Untuk 40 kue diperlukan 2 kg tepung. Berapa kue dari 3 kg tepung?",
+      "marks": {
+        "relevant": [
+          "40",
+          "2",
+          "3"
+        ],
+        "distractors": [],
+        "question": "Berapa kue dari 3 kg tepung?"
+      },
+      "table": {
+        "columns": [
+          "Tepung (kg)",
+          "Kue"
+        ],
+        "rows": [
+          [
+            2,
+            40
+          ],
+          [
+            3,
+            null
+          ]
+        ]
+      },
+      "answer": 60,
+      "swappedAnswer": 26.67,
+      "prefilled": [
+        "diketahui",
+        "ditanya"
+      ],
+      "hints": [
+        "Tepung lebih banyak, kuenya lebih banyak atau lebih sedikit?",
+        "1 kg tepung = 40 : 2 kue.",
+        "1 kg = 20 kue. Jadi 3 kg = 20 × 3."
+      ],
+      "twin": {
+        "text": "Untuk 45 kue diperlukan 3 kg tepung. Berapa kue dari 5 kg tepung?",
+        "rows": [
+          [
+            3,
+            45
+          ],
+          [
+            5,
+            null
+          ]
+        ],
+        "answer": 75
+      }
+    },
+    {
+      "id": "M3-L1",
+      "phase": "latihan",
+      "type": "senilai",
+      "context": "barang-harga",
+      "text": "Harga 4 kg beras Rp56.000. Berapa harga 7 kg beras yang sama?",
+      "marks": {
+        "relevant": [
+          "4",
+          "56.000",
+          "7"
+        ],
+        "distractors": [],
+        "question": "Berapa harga 7 kg beras yang sama?"
+      },
+      "table": {
+        "columns": [
+          "Beras (kg)",
+          "Harga (Rp)"
+        ],
+        "rows": [
+          [
+            4,
+            56000
+          ],
+          [
+            7,
+            null
+          ]
+        ]
+      },
+      "answer": 98000,
+      "swappedAnswer": 32000,
+      "hints": [
+        "Jika berasnya lebih banyak, harganya lebih mahal atau lebih murah?",
+        "Cari harga 1 kg dulu.",
+        "56.000 : 4 = 14.000. Lalu 14.000 × 7."
+      ],
+      "twin": {
+        "text": "Harga 3 kg beras Rp42.000. Berapa harga 5 kg beras yang sama?",
+        "rows": [
+          [
+            3,
+            42000
+          ],
+          [
+            5,
+            null
+          ]
+        ],
+        "answer": 70000
+      }
+    },
+    {
+      "id": "M3-L2",
+      "phase": "latihan",
+      "type": "senilai",
+      "context": "kue-tepung",
+      "text": "Untuk 12 kue diperlukan 3 gelas tepung. Berapa gelas tepung untuk 20 kue?",
+      "marks": {
+        "relevant": [
+          "12",
+          "3",
+          "20"
+        ],
+        "distractors": [],
+        "question": "Berapa gelas tepung untuk 20 kue?"
+      },
+      "table": {
+        "columns": [
+          "Kue",
+          "Tepung (gelas)"
+        ],
+        "rows": [
+          [
+            12,
+            3
+          ],
+          [
+            20,
+            null
+          ]
+        ]
+      },
+      "answer": 5,
+      "swappedAnswer": 1.8,
+      "hints": [
+        "Kue lebih banyak, tepungnya lebih banyak atau lebih sedikit?",
+        "Berapa kue dari 1 gelas tepung?",
+        "12 : 3 = 4 kue per gelas. 20 kue perlu 20 : 4 gelas."
+      ],
+      "twin": {
+        "text": "Untuk 15 kue diperlukan 3 gelas tepung. Berapa gelas tepung untuk 30 kue?",
+        "rows": [
+          [
+            15,
+            3
+          ],
+          [
+            30,
+            null
+          ]
+        ],
+        "answer": 6
+      }
+    },
+    {
+      "id": "M3-L3",
+      "phase": "latihan",
+      "type": "senilai",
+      "context": "jarak-ongkos",
+      "text": "Tarif ojek per km sama. Ongkos 4 km Rp10.000. Berapa ongkos 10 km?",
+      "marks": {
+        "relevant": [
+          "4",
+          "10.000",
+          "10"
+        ],
+        "distractors": [],
+        "question": "Berapa ongkos 10 km?"
+      },
+      "table": {
+        "columns": [
+          "Jarak (km)",
+          "Ongkos (Rp)"
+        ],
+        "rows": [
+          [
+            4,
+            10000
+          ],
+          [
+            10,
+            null
+          ]
+        ]
+      },
+      "answer": 25000,
+      "swappedAnswer": 4000,
+      "hints": [
+        "Jarak lebih jauh, ongkos lebih mahal atau lebih murah?",
+        "Cari ongkos 1 km.",
+        "10.000 : 4 = 2.500. Lalu 2.500 × 10."
+      ],
+      "twin": {
+        "text": "Tarif ojek per km sama. Ongkos 5 km Rp12.500. Berapa ongkos 8 km?",
+        "rows": [
+          [
+            5,
+            12500
+          ],
+          [
+            8,
+            null
+          ]
+        ],
+        "answer": 20000
+      }
+    },
+    {
+      "id": "M3-L4",
+      "phase": "latihan",
+      "type": "senilai",
+      "context": "jarak-waktu",
+      "text": "Pak Budi berangkat pukul 06.00. Ia berjalan dengan kecepatan tetap dan menempuh 3 km dalam 45 menit. Berapa menit untuk menempuh 5 km?",
+      "marks": {
+        "relevant": [
+          "3",
+          "45",
+          "5"
+        ],
+        "distractors": [
+          "06.00"
+        ],
+        "question": "Berapa menit untuk menempuh 5 km?"
+      },
+      "table": {
+        "columns": [
+          "Jarak (km)",
+          "Waktu (menit)"
+        ],
+        "rows": [
+          [
+            3,
+            45
+          ],
+          [
+            5,
+            null
+          ]
+        ]
+      },
+      "answer": 75,
+      "swappedAnswer": 27,
+      "hints": [
+        "Apakah pukul 06.00 dipakai untuk menghitung?",
+        "Berapa menit untuk 1 km?",
+        "45 : 3 = 15 menit per km. Lalu 15 × 5."
+      ],
+      "twin": {
+        "text": "Pak Budi berangkat pukul 06.30. Ia berjalan dengan kecepatan tetap dan menempuh 2 km dalam 30 menit. Berapa menit untuk menempuh 6 km?",
+        "rows": [
+          [
+            2,
+            30
+          ],
+          [
+            6,
+            null
+          ]
+        ],
+        "answer": 90
+      }
+    },
+    {
+      "id": "M3-M1",
+      "phase": "mandiri",
+      "type": "senilai",
+      "context": "barang-harga",
+      "text": "Harga 6 pensil Rp15.000. Berapa harga 10 pensil yang sama?",
+      "marks": {
+        "relevant": [
+          "6",
+          "15.000",
+          "10"
+        ],
+        "distractors": [],
+        "question": "Berapa harga 10 pensil yang sama?"
+      },
+      "table": {
+        "columns": [
+          "Pensil",
+          "Harga (Rp)"
+        ],
+        "rows": [
+          [
+            6,
+            15000
+          ],
+          [
+            10,
+            null
+          ]
+        ]
+      },
+      "answer": 25000,
+      "swappedAnswer": 9000,
+      "hints": [
+        "Pensil lebih banyak, harganya lebih mahal atau lebih murah?",
+        "Cari harga 1 pensil."
+      ]
+    },
+    {
+      "id": "M3-M2",
+      "phase": "mandiri",
+      "type": "senilai",
+      "context": "cat-luas",
+      "text": "5 liter cat cukup untuk dinding seluas 20 m². Berapa liter cat untuk dinding 32 m²?",
+      "marks": {
+        "relevant": [
+          "5",
+          "20",
+          "32"
+        ],
+        "distractors": [],
+        "question": "Berapa liter cat untuk dinding 32 m²?"
+      },
+      "table": {
+        "columns": [
+          "Cat (L)",
+          "Luas (m²)"
+        ],
+        "rows": [
+          [
+            5,
+            20
+          ],
+          [
+            null,
+            32
+          ]
+        ]
+      },
+      "answer": 8,
+      "swappedAnswer": 3.13,
+      "hints": [
+        "Dinding lebih luas, catnya lebih banyak atau lebih sedikit?",
+        "1 liter cat untuk berapa m²?"
+      ]
+    },
+    {
+      "id": "M3-M3",
+      "phase": "mandiri",
+      "type": "senilai",
+      "context": "lembar-waktu",
+      "text": "Mesin mencetak 120 lembar dalam 4 menit. Mesin dibeli tahun 2020. Berapa menit untuk 300 lembar?",
+      "marks": {
+        "relevant": [
+          "120",
+          "4",
+          "300"
+        ],
+        "distractors": [
+          "2020"
+        ],
+        "question": "Berapa menit untuk 300 lembar?"
+      },
+      "table": {
+        "columns": [
+          "Lembar",
+          "Menit"
+        ],
+        "rows": [
+          [
+            120,
+            4
+          ],
+          [
+            300,
+            null
+          ]
+        ]
+      },
+      "answer": 10,
+      "swappedAnswer": 1.6,
+      "hints": [
+        "Apakah tahun 2020 dipakai untuk menghitung?",
+        "Berapa lembar per menit?"
+      ]
+    }
+  ],
+  "closing": "Kamu sudah bisa menghitung senilai. Ingat: senilai → hasil bagi tetap. Berikutnya: berbalik nilai."
+}

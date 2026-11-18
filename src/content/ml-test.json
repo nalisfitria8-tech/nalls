@@ -1,0 +1,189 @@
+{
+  "id": "ML",
+  "type": "ml_test",
+  "title": "Tes Literasi Matematika",
+  "source": "Tabel 2. Soal dan Kisi-kisi Jawaban Mathematical Literacy (dokumen tugas pengembang, 12 November 2026). Teks soal dan rubrik disalin tanpa perubahan.",
+  "maxScore": 24,
+  "phases": {
+    "awal": "Tes awal",
+    "akhir": "Tes akhir"
+  },
+  "intro": [
+    "Tes ini berisi 4 soal cerita. Satu soal satu layar.",
+    "Tulis langkah dan alasanmu di kotak jawaban, bukan hanya jawaban akhir.",
+    "Tidak ada batas waktu. Jawaban bisa diubah sampai kamu menekan Kirim."
+  ],
+  "tasks": [
+    {
+      "id": "ML1",
+      "indicator": {
+        "code": "reasoning",
+        "name": "Mathematical Reasoning",
+        "description": "Siswa mampu mengidentifikasi hubungan matematis, membandingkan alternatif, memberikan alasan, dan menentukan keputusan yang dapat dipertanggungjawabkan."
+      },
+      "text": [
+        "Nisa ingin membeli gula untuk membuat kue. Ia menemukan tiga pilihan kemasan gula di sebuah toko:",
+        {
+          "list": [
+            "A: 2 kg seharga Rp28.000.",
+            "B: 3 kg seharga Rp39.000.",
+            "C: 5 kg seharga Rp70.000."
+          ]
+        },
+        "Nisa ingin membeli gula dengan harga paling hemat berdasarkan harga per kilogramnya. Kemasan manakah yang sebaiknya dipilih Nisa? Bandingkan harga per kilogram dari ketiga kemasan dan berikan alasan matematis yang mendukung keputusanmu!"
+      ],
+      "stages": [
+        {
+          "n": 1,
+          "description": "Mengidentifikasi informasi: A = 2 kg Rp28.000, B = 3 kg Rp39.000, dan C = 5 kg Rp70.000.",
+          "score": 1
+        },
+        {
+          "n": 2,
+          "description": "Menghitung harga per kg kemasan A dan B: A = Rp28.000 ÷ 2 = Rp14.000/kg; B = Rp39.000 ÷ 3 = Rp13.000/kg.",
+          "score": 2
+        },
+        {
+          "n": 3,
+          "description": "Menghitung harga per kg kemasan C: Rp70.000 ÷ 5 = Rp14.000/kg.",
+          "score": 1
+        },
+        {
+          "n": 4,
+          "description": "Membandingkan hasil: A = Rp14.000/kg, B = Rp13.000/kg, C = Rp14.000/kg.",
+          "score": 1
+        },
+        {
+          "n": 5,
+          "description": "Menentukan kemasan B karena harga per kilogramnya paling murah, yaitu Rp13.000.",
+          "score": 1
+        }
+      ],
+      "maxScore": 6
+    },
+    {
+      "id": "ML2",
+      "indicator": {
+        "code": "formulating",
+        "name": "Formulating Situations Mathematically",
+        "description": "Siswa mampu mengidentifikasi informasi relevan, menentukan besaran, dan menerjemahkan situasi nyata menjadi model matematika."
+      },
+      "text": [
+        "Untuk membuat minuman pada acara sekolah, diperlukan 3 gelas sirup untuk dicampurkan dengan 12 gelas air. Karena jumlah peserta bertambah, panitia ingin menggunakan 20 gelas air dengan rasa minuman yang tetap sama.",
+        "Buatlah model matematika untuk menentukan banyak sirup yang diperlukan. Tuliskan informasi yang diketahui, besaran yang dicari, jenis perbandingan, dan bentuk persamaan matematikanya!"
+      ],
+      "stages": [
+        {
+          "n": 1,
+          "description": "Mengidentifikasi informasi: 3 gelas sirup dan 12 gelas air.",
+          "score": 1
+        },
+        {
+          "n": 2,
+          "description": "Menentukan yang ditanyakan: banyak sirup untuk 20 gelas air.",
+          "score": 1
+        },
+        {
+          "n": 3,
+          "description": "Menentukan besaran: jumlah gelas sirup dan jumlah gelas air.",
+          "score": 1
+        },
+        {
+          "n": 4,
+          "description": "Menentukan hubungan sebagai perbandingan senilai karena semakin banyak air, semakin banyak sirup diperlukan agar rasa tetap sama.",
+          "score": 1
+        },
+        {
+          "n": 5,
+          "description": "Memisalkan banyak sirup yang diperlukan dengan variabel x.",
+          "score": 1
+        },
+        {
+          "n": 6,
+          "description": "Membuat model matematika: 3/12 = x/20.",
+          "score": 1
+        }
+      ],
+      "maxScore": 6
+    },
+    {
+      "id": "ML3",
+      "indicator": {
+        "code": "employing",
+        "name": "Employing Mathematical Concepts, Facts, and Procedures",
+        "description": "Siswa mampu memilih serta menggunakan konsep, operasi, prosedur, dan strategi matematika untuk memperoleh solusi."
+      },
+      "text": [
+        "Sebuah pekerjaan membersihkan lingkungan sekolah dapat diselesaikan oleh 6 orang dalam waktu 15 hari. Jumlah pekerja ditambah menjadi 10 orang. Jika kemampuan setiap pekerja sama dan semua bekerja dengan waktu yang sama setiap hari, berapa hari yang dibutuhkan untuk menyelesaikan pekerjaan tersebut? Selesaikan menggunakan konsep perbandingan berbalik nilai!"
+      ],
+      "stages": [
+        {
+          "n": 1,
+          "description": "Menuliskan informasi: 6 orang menyelesaikan pekerjaan dalam 15 hari, jumlah pekerja menjadi 10 orang.",
+          "score": 1
+        },
+        {
+          "n": 2,
+          "description": "Menentukan hubungan jumlah pekerja dan waktu sebagai perbandingan berbalik nilai, sehingga menggunakan rumus a₁ × b₁ = a₂ × b₂.",
+          "score": 2
+        },
+        {
+          "n": 3,
+          "description": "Memasukkan nilai: 6 × 15 = 10 × x; 90 = 10x; x = 90 ÷ 10 = 9.",
+          "score": 2
+        },
+        {
+          "n": 4,
+          "description": "Menuliskan kesimpulan: pekerjaan dapat diselesaikan dalam waktu 9 hari.",
+          "score": 1
+        }
+      ],
+      "maxScore": 6
+    },
+    {
+      "id": "ML4",
+      "indicator": {
+        "code": "interpreting",
+        "name": "Interpreting, Applying, and Evaluating Mathematical Outcomes",
+        "description": "Siswa mampu menafsirkan hasil matematika dalam konteks, menilai kewajaran hasil, dan mengambil keputusan berdasarkan hasil perhitungan."
+      },
+      "text": [
+        "Sebuah bak air dapat diisi penuh oleh 6 keran dalam waktu 24 menit. Jika digunakan 8 keran dengan kemampuan aliran air yang sama, waktu yang diperlukan seharusnya lebih singkat.",
+        "Seorang siswa menghitung bahwa waktu yang dibutuhkan adalah 32 menit. Apakah jawaban siswa tersebut benar? Periksa perhitungannya menggunakan konsep perbandingan berbalik nilai, kemudian jelaskan apakah hasil yang benar masuk akal berdasarkan situasi tersebut!"
+      ],
+      "stages": [
+        {
+          "n": 1,
+          "description": "Mengidentifikasi informasi: 6 keran membutuhkan 24 menit dan jumlah keran menjadi 8.",
+          "score": 1
+        },
+        {
+          "n": 2,
+          "description": "Menentukan hubungan jumlah keran dan waktu sebagai perbandingan berbalik nilai.",
+          "score": 1
+        },
+        {
+          "n": 3,
+          "description": "Menuliskan model matematika: 6 × 24 = 8 × x.",
+          "score": 1
+        },
+        {
+          "n": 4,
+          "description": "Menghitung: 144 = 8x, sehingga x = 144 ÷ 8 = 18 menit.",
+          "score": 1
+        },
+        {
+          "n": 5,
+          "description": "Menilai jawaban siswa: 32 menit tidak benar karena hasil yang tepat adalah 18 menit.",
+          "score": 1
+        },
+        {
+          "n": 6,
+          "description": "Menyimpulkan bahwa 18 menit masuk akal karena semakin banyak keran, semakin cepat bak terisi, dengan asumsi debit setiap keran sama.",
+          "score": 1
+        }
+      ],
+      "maxScore": 6
+    }
+  ]
+}

@@ -1,0 +1,252 @@
+
+import mlMcq from '../content/ml-mcq.json';
+
+export const PHASES = ['awal', 'akhir'];
+
+export const emptyPhase = () => ({
+  answers: {},
+  mcqAnswers: {},
+  startedAt: null,
+  submittedAt: null,
+  progressAtSubmit: null,
+  scores: {},
+  scoredAt: null,
+});
+
+export function validStageScores(task, scores) {
+  return (
+    Array.isArray(scores) &&
+    scores.length === task.stages.length &&
+    scores.every(
+      (v, i) =>
+        Number.isInteger(v) &&
+        v >= 0 &&
+        v <= task.stages[i].score
+    )
+  );
+}
+
+export function taskScore(task, scores) {
+  return validStageScores(task, scores)
+    ? scores.reduce((a, b) => a + b, 0)
+    : null;
+}
+
+export function phaseStatus(test, phase) {
+  if (!phase?.submittedAt) {
+    return phase?.startedAt ? 'mengerjakan' : 'belum';
+  }
+
+  return test.tasks.every(
+    (t) => taskScore(t, phase.scores?.[t.id]) !== null
+  )
+    ? 'dinilai'
+    : 'terkirim';
+}
+
+export function mcqScore(phase) {
+  if (!phase) return 0;
+
+  return mlMcq.reduce((total, question) => {
+    return total + (
+      phase.mcqAnswers?.[question.id] === question.answer ? 1 : 0
+    );
+  }, 0);
+}
+
+export function phaseSummary(test, phase) {
+  const perTask = test.tasks.map((t) => ({
+    id: t.id,
+    code: t.indicator.code,
+    name: t.indicator.name,
+    score: taskScore(t, phase?.scores?.[t.id]),
+    max: t.maxScore,
+  }));
+
+  const status = phaseStatus(test, phase);
+
+  const essayTotal = status === 'dinilai'
+    ? perTask.reduce((a, t) => a + t.score, 0)
+    : null;
+
+  const total = essayTotal === null
+    ? null
+    : essayTotal + mcqScore(phase);
+
+  const max = test.maxScore + mlMcq.length;
+
+  return {
+    status,
+    total,
+    max,
+    essayTotal,
+    mcqTotal: phase?.submittedAt ? mcqScore(phase) : null,
+    mcqMax: mlMcq.length,
+    perTask,
+  };
+}
+
+export function nGain(pre, post, max) {
+  if (
+    pre === null ||
+    post === null ||
+    pre === undefined ||
+    post === undefined ||
+    pre >= max
+  ) {
+    return null;
+  }
+
+  return (post - pre) / (max - pre);
+}
+
+export function nGainCategory(g) {
+  if (g === null) return null;
+  if (g >= 0.7) return 'tinggi';
+  if (g >= 0.3) return 'sedang';
+  return 'rendah';
+}
+
+export const isAnswered = (text) =>
+  typeof text === 'string' && text.trim().length > 0;
+
+const decimal = (x, digits = 2) =>
+  x === null || x === undefined
+    ? ''
+    : x.toFixed(digits).replace('.', ',');
+
+function cell(v) {
+  const s = v === null || v === undefined ? '' : String(v);
+  return /[";\n\r]/.test(s)
+    ? `"${s.replace(/"/g, '""')}"`
+    : s;
+}
+
+export function toCsv(rows) {
+  return (
+    '\uFEFF' +
+    rows.map((r) => r.map(cell).join(';')).join('\r\n') +
+    '\r\n'
+  );
+}
+
+const MAX_STAGES = 6;
+
+export function detailRows(test, ml, meta) {
+  const header = [
+    'perangkat',
+    'kode_peserta',
+    'kelas',
+    'fase',
+    'soal',
+    'indikator',
+    ...Array.from(
+      { length: MAX_STAGES },
+      (_, i) => `tahap_${i + 1}`
+    ),
+    'skor_soal',
+    'skor_maks_soal',
+    'jawaban_pg_1',
+    'jawaban_pg_2',
+    'jawaban_pg_3',
+    'jawaban_pg_4',
+    'skor_pg',
+    'dikirim',
+    'dinilai',
+    'modul_selesai_saat_kirim',
+    'jawaban',
+  ];
+
+  const rows = [header];
+
+  for (const phaseName of PHASES) {
+    const phase = ml[phaseName];
+    if (!phase?.submittedAt) continue;
+
+    const done = Object.entries(phase.progressAtSubmit || {})
+      .filter(([, v]) => v === 'selesai')
+      .map(([k]) => k)
+      .join(' ');
+
+    for (const task of test.tasks) {
+      const scores = phase.scores?.[task.id];
+
+      const stageCells = Array.from(
+        { length: MAX_STAGES },
+        (_, i) =>
+          i < task.stages.length && Array.isArray(scores)
+            ? scores[i] ?? ''
+            : ''
+      );
+
+      rows.push([
+        meta.deviceId,
+        meta.participant,
+        meta.grade,
+        phaseName,
+        task.id,
+        task.indicator.name,
+        ...stageCells,
+        taskScore(task, scores) ?? '',
+        task.maxScore,
+        ...mlMcq.map((q) => {
+          const answer = phase.mcqAnswers?.[q.id];
+          return answer === undefined
+            ? ''
+            : q.options[answer] ?? '';
+        }),
+        mcqScore(phase),
+        phase.submittedAt,
+        phase.scoredAt ?? '',
+        done,
+        phase.answers?.[task.id] ?? '',
+      ]);
+    }
+  }
+
+  return rows;
+}
+
+export function summaryRows(test, ml, meta) {
+  const pre = phaseSummary(test, ml.awal);
+  const post = phaseSummary(test, ml.akhir);
+
+  const max = test.maxScore + mlMcq.length;
+  const g = nGain(pre.total, post.total, max);
+
+  const header = [
+    'perangkat',
+    'kode_peserta',
+    'kelas',
+    ...test.tasks.flatMap((t) => [
+      `awal_${t.id}_${t.indicator.code}`,
+      `akhir_${t.id}_${t.indicator.code}`,
+    ]),
+    'awal_pg',
+    'akhir_pg',
+    'awal_total',
+    'akhir_total',
+    'skor_maks',
+    'n_gain',
+    'kategori_n_gain',
+  ];
+
+  const row = [
+    meta.deviceId,
+    meta.participant,
+    meta.grade,
+    ...test.tasks.flatMap((t, i) => [
+      pre.perTask[i].score ?? '',
+      post.perTask[i].score ?? '',
+    ]),
+    pre.mcqTotal ?? '',
+    post.mcqTotal ?? '',
+    pre.total ?? '',
+    post.total ?? '',
+    max,
+    decimal(g),
+    nGainCategory(g) ?? '',
+  ];
+
+  return [header, row];
+}

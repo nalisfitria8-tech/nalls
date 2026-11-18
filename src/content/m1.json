@@ -1,0 +1,51 @@
+{
+  "module": "M1",
+  "title": "Mengingat Perbandingan",
+  "evidence": ["K01", "EL02", "EL04", "IL03"],
+  "screens": [
+    {
+      "id": "M1-01",
+      "text": ["Perbandingan menunjukkan hubungan dua banyaknya benda."],
+      "tables": [{ "columns": [{ "label": "Kelereng merah" }, { "label": "Kelereng biru" }], "rows": [[4, 6]] }],
+      "after": ["Perbandingan merah dan biru ditulis 4 : 6."]
+    },
+    {
+      "id": "M1-02",
+      "text": ["4 : 6 bisa disederhanakan. Bagi keduanya dengan 2."],
+      "tables": [{ "columns": [{ "label": "" }, { "label": "Merah" }, { "label": "Biru" }], "rows": [["Awal", 4, 6], ["Dibagi 2", 2, 3]] }],
+      "after": ["Jadi 4 : 6 = 2 : 3."]
+    },
+    {
+      "id": "M1-03",
+      "text": ["Harga 1 buku Rp4.000. Lihat tabelnya."],
+      "tables": [{ "columns": [{ "label": "Buku" }, { "label": "Harga (Rp)" }], "rows": [[1, 4000], [2, 8000], [3, 12000]] }],
+      "after": ["Harga 1 buku disebut **harga satuan**."],
+      "evidence": ["K01", "EL02"]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "M1-L1", "form": "pilihan", "phase": "contoh",
+      "text": "Sederhanakan 10 : 15.",
+      "options": ["2 : 3", "3 : 2", "1 : 5", "5 : 10"], "answer": "2 : 3",
+      "why": "10 dan 15 sama-sama dibagi 5.",
+      "hints": ["Bilangan berapa yang bisa membagi 10 dan 15?", "Bagi keduanya dengan 5."]
+    },
+    {
+      "id": "M1-L2", "form": "pilihan", "phase": "contoh",
+      "text": "Di kelas ada 12 siswa putra dan 18 siswa putri. Perbandingan putra : putri adalah …",
+      "options": ["2 : 3", "3 : 2", "12 : 30", "6 : 9"], "answer": "2 : 3",
+      "why": "12 : 18, keduanya dibagi 6.",
+      "partial": { "6 : 9": "Benar, tetapi masih bisa disederhanakan." },
+      "hints": ["Urutannya putra dulu, lalu putri.", "12 : 18, bagi keduanya dengan 6."]
+    },
+    {
+      "id": "M1-L3", "form": "isian", "phase": "contoh",
+      "text": "Harga 1 pensil Rp3.000. Harga 4 pensil adalah …",
+      "answer": 12000, "calc": "3000 * 4",
+      "why": "3.000 × 4 = 12.000.",
+      "hints": ["Harga 1 pensil sudah diketahui.", "Kalikan harga satuan dengan banyak pensil."]
+    }
+  ],
+  "closing": "Perbandingan bisa disederhanakan. Harga 1 barang disebut harga satuan. Berikutnya: membedakan dua jenis perbandingan."
+}

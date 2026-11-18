@@ -1,0 +1,26 @@
+[
+  {
+    "id": "PG1",
+    "question": "Harga gula di Toko A Rp28.000 untuk 2 kg, Toko B Rp39.000 untuk 3 kg, dan Toko C Rp70.000 untuk 5 kg. Toko mana yang paling murah per kilogram?",
+    "options": ["Toko A", "Toko B", "Toko C", "Semua sama"],
+    "answer": 1
+  },
+  {
+    "id": "PG2",
+    "question": "Perbandingan sirup dan air adalah 3 : 12. Jika air yang digunakan 20 gelas, berapa gelas sirup yang diperlukan?",
+    "options": ["3 gelas", "4 gelas", "5 gelas", "6 gelas"],
+    "answer": 2
+  },
+  {
+    "id": "PG3",
+    "question": "Enam pekerja menyelesaikan pekerjaan dalam 15 hari. Jika pekerjanya menjadi 10 orang dengan kemampuan sama, berapa hari yang diperlukan?",
+    "options": ["6 hari", "9 hari", "12 hari", "25 hari"],
+    "answer": 1
+  },
+  {
+    "id": "PG4",
+    "question": "Enam keran mengisi bak dalam 24 menit. Jika digunakan 8 keran dengan aliran sama, berapa waktu yang diperlukan?",
+    "options": ["16 menit", "18 menit", "20 menit", "32 menit"],
+    "answer": 1
+  }
+]

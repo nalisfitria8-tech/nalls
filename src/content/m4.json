@@ -1,0 +1,664 @@
+{
+  "module": "M4",
+  "title": "Menghitung Berbalik Nilai",
+  "evidence": [
+    "IL01",
+    "IL04",
+    "GL01",
+    "IL05",
+    "GL02"
+  ],
+  "screens": [
+    {
+      "id": "M4-01",
+      "text": [
+        "Berbalik nilai juga punya dua cara. Kuncinya: hasil kali tetap."
+      ],
+      "tables": [
+        {
+          "columns": [
+            {
+              "label": "Cara"
+            },
+            {
+              "label": "6 pekerja 10 hari, jika 4 pekerja?"
+            }
+          ],
+          "rows": [
+            [
+              "Nilai satuan",
+              "Total pekerjaan 6 × 10 = 60 hari-orang → 60 : 4 = 15 hari"
+            ],
+            [
+              "Perbandingan",
+              "6 × 10 = 4 × ? → ? = 60 : 4 = 15"
+            ]
+          ]
+        }
+      ],
+      "after": [
+        "Hati-hati: jangan dihitung seperti senilai."
+      ]
+    },
+    {
+      "id": "M4-02",
+      "text": [
+        "60 hari-orang artinya pekerjaan itu sama dengan 1 orang bekerja 60 hari."
+      ],
+      "tables": [
+        {
+          "columns": [
+            {
+              "label": "Pekerja"
+            },
+            {
+              "label": "Hari"
+            },
+            {
+              "label": "Pekerja × Hari"
+            }
+          ],
+          "rows": [
+            [
+              1,
+              60,
+              60
+            ],
+            [
+              6,
+              10,
+              60
+            ],
+            [
+              4,
+              15,
+              60
+            ]
+          ],
+          "check": "product"
+        }
+      ],
+      "evidence": [
+        "IL04",
+        "EL02"
+      ]
+    },
+    {
+      "id": "M4-E1-1",
+      "text": [
+        "**Contoh.** 6 pekerja menyelesaikan pagar dalam 10 hari. Berapa hari jika dikerjakan 4 pekerja?",
+        "**① Diketahui.** Angka yang penting dipindah ke tabel."
+      ],
+      "tables": [
+        {
+          "columns": [
+            {
+              "label": "Pekerja"
+            },
+            {
+              "label": "Hari"
+            }
+          ],
+          "rows": [
+            [
+              6,
+              10
+            ],
+            [
+              4,
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M4-E1-2",
+      "text": [
+        "**② Ditanya:** hari jika 4 pekerja (tanda ?)."
+      ],
+      "tables": [
+        {
+          "columns": [
+            {
+              "label": "Pekerja"
+            },
+            {
+              "label": "Hari"
+            }
+          ],
+          "rows": [
+            [
+              6,
+              10
+            ],
+            [
+              4,
+              null
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M4-E1-3",
+      "text": [
+        "**③ Jenis.** Pekerja berkurang (6 → 4), pagar lebih lama selesai. Hari bertambah. Arahnya berlawanan."
+      ],
+      "tables": [
+        {
+          "columns": [
+            {
+              "label": "Pekerja",
+              "arrow": "↓"
+            },
+            {
+              "label": "Hari",
+              "arrow": "↑"
+            }
+          ],
+          "rows": [
+            [
+              6,
+              10
+            ],
+            [
+              4,
+              null
+            ]
+          ]
+        }
+      ],
+      "after": [
+        "Jadi [[berbalik]]."
+      ]
+    },
+    {
+      "id": "M4-E1-4",
+      "text": [
+        "**④ Hitung.** Berbalik nilai → hasil kali tetap.",
+        "6 × 10 = 4 × ?  →  ? = 60 : 4 = **15**"
+      ],
+      "tables": [
+        {
+          "columns": [
+            {
+              "label": "Pekerja"
+            },
+            {
+              "label": "Hari"
+            }
+          ],
+          "rows": [
+            [
+              6,
+              10
+            ],
+            [
+              4,
+              15
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M4-E1-5",
+      "text": [
+        "**Cek.** Pekerja lebih sedikit, waktunya lebih lama. 15 lebih besar dari 10. Masuk akal ✔",
+        "Sekarang giliranmu."
+      ],
+      "evidence": [
+        "GL02"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "M4-E2",
+      "phase": "setengah",
+      "type": "berbalik",
+      "context": "ternak-pakan",
+      "text": "Pakan cukup untuk 20 ayam selama 15 hari. Jika ayamnya 25, berapa hari pakan habis?",
+      "marks": {
+        "relevant": [
+          "20",
+          "15",
+          "25"
+        ],
+        "distractors": [],
+        "question": "Jika ayamnya 25, berapa hari pakan habis?"
+      },
+      "table": {
+        "columns": [
+          "Ayam",
+          "Hari"
+        ],
+        "rows": [
+          [
+            20,
+            15
+          ],
+          [
+            25,
+            null
+          ]
+        ]
+      },
+      "answer": 12,
+      "swappedAnswer": 18.75,
+      "prefilled": [
+        "diketahui",
+        "ditanya",
+        "jenis"
+      ],
+      "hints": [
+        "Ayam lebih banyak, pakan habis lebih cepat atau lebih lama?",
+        "Hasil kali tetap: 20 × 15 = ?",
+        "20 × 15 = 300. Lalu 300 : 25."
+      ],
+      "twin": {
+        "text": "Pakan cukup untuk 30 ayam selama 12 hari. Jika ayamnya 40, berapa hari pakan habis?",
+        "rows": [
+          [
+            30,
+            12
+          ],
+          [
+            40,
+            null
+          ]
+        ],
+        "answer": 9
+      }
+    },
+    {
+      "id": "M4-E3",
+      "phase": "setengah",
+      "type": "berbalik",
+      "context": "kecepatan-waktu",
+      "text": "Dengan kecepatan 60 km/jam, perjalanan ditempuh 3 jam. Berapa jam jika kecepatannya 90 km/jam?",
+      "marks": {
+        "relevant": [
+          "60",
+          "3",
+          "90"
+        ],
+        "distractors": [],
+        "question": "Berapa jam jika kecepatannya 90 km/jam?"
+      },
+      "table": {
+        "columns": [
+          "Kecepatan (km/jam)",
+          "Waktu (jam)"
+        ],
+        "rows": [
+          [
+            60,
+            3
+          ],
+          [
+            90,
+            null
+          ]
+        ]
+      },
+      "answer": 2,
+      "swappedAnswer": 4.5,
+      "prefilled": [
+        "diketahui",
+        "ditanya"
+      ],
+      "hints": [
+        "Lebih cepat, sampainya lebih cepat atau lebih lama?",
+        "Kecepatan × waktu = jarak, selalu sama.",
+        "60 × 3 = 180. Lalu 180 : 90."
+      ],
+      "twin": {
+        "text": "Dengan kecepatan 50 km/jam, perjalanan ditempuh 6 jam. Berapa jam jika kecepatannya 75 km/jam?",
+        "rows": [
+          [
+            50,
+            6
+          ],
+          [
+            75,
+            null
+          ]
+        ],
+        "answer": 4
+      }
+    },
+    {
+      "id": "M4-L1",
+      "phase": "latihan",
+      "type": "berbalik",
+      "context": "pekerja-waktu",
+      "text": "Suatu pekerjaan selesai dalam 15 hari oleh 8 orang. Jika dikerjakan 12 orang, berapa hari selesai?",
+      "marks": {
+        "relevant": [
+          "15",
+          "8",
+          "12"
+        ],
+        "distractors": [],
+        "question": "Jika dikerjakan 12 orang, berapa hari selesai?"
+      },
+      "table": {
+        "columns": [
+          "Orang",
+          "Hari"
+        ],
+        "rows": [
+          [
+            8,
+            15
+          ],
+          [
+            12,
+            null
+          ]
+        ]
+      },
+      "answer": 10,
+      "swappedAnswer": 22.5,
+      "hints": [
+        "Lebih banyak orang, lebih cepat atau lebih lama?",
+        "Hitung total pekerjaan: orang × hari.",
+        "8 × 15 = 120. Lalu 120 : 12."
+      ],
+      "twin": {
+        "text": "Suatu pekerjaan selesai dalam 12 hari oleh 10 orang. Jika dikerjakan 15 orang, berapa hari selesai?",
+        "rows": [
+          [
+            10,
+            12
+          ],
+          [
+            15,
+            null
+          ]
+        ],
+        "answer": 8
+      }
+    },
+    {
+      "id": "M4-L2",
+      "phase": "latihan",
+      "type": "berbalik",
+      "context": "kecepatan-waktu",
+      "text": "Dengan kecepatan 40 km/jam, Dika sampai dalam 3 jam. Agar sampai dalam 2 jam, berapa kecepatannya?",
+      "marks": {
+        "relevant": [
+          "40",
+          "3",
+          "2"
+        ],
+        "distractors": [],
+        "question": "Agar sampai dalam 2 jam, berapa kecepatannya?"
+      },
+      "table": {
+        "columns": [
+          "Kecepatan (km/jam)",
+          "Waktu (jam)"
+        ],
+        "rows": [
+          [
+            40,
+            3
+          ],
+          [
+            null,
+            2
+          ]
+        ]
+      },
+      "answer": 60,
+      "swappedAnswer": 26.67,
+      "hints": [
+        "Supaya sampai lebih cepat, motornya harus lebih cepat atau lebih lambat?",
+        "Kecepatan × waktu tetap.",
+        "40 × 3 = 120. Lalu 120 : 2."
+      ],
+      "twin": {
+        "text": "Dengan kecepatan 30 km/jam, Dika sampai dalam 4 jam. Agar sampai dalam 3 jam, berapa kecepatannya?",
+        "rows": [
+          [
+            30,
+            4
+          ],
+          [
+            null,
+            3
+          ]
+        ],
+        "answer": 40
+      }
+    },
+    {
+      "id": "M4-L3",
+      "phase": "latihan",
+      "type": "berbalik",
+      "context": "bagi-rata",
+      "text": "Satu kue dibagi rata ke 6 anak, masing-masing 4 potong. Jika kue yang sama dibagi ke 8 anak, berapa potong tiap anak?",
+      "marks": {
+        "relevant": [
+          "6",
+          "4",
+          "8"
+        ],
+        "distractors": [],
+        "question": "Jika kue yang sama dibagi ke 8 anak, berapa potong tiap anak?"
+      },
+      "table": {
+        "columns": [
+          "Anak",
+          "Potong per anak"
+        ],
+        "rows": [
+          [
+            6,
+            4
+          ],
+          [
+            8,
+            null
+          ]
+        ]
+      },
+      "answer": 3,
+      "swappedAnswer": 5.33,
+      "hints": [
+        "Anak lebih banyak, bagian tiap anak lebih banyak atau sedikit?",
+        "Berapa potong seluruhnya?",
+        "6 × 4 = 24 potong. Lalu 24 : 8."
+      ],
+      "twin": {
+        "text": "Satu kue dibagi rata ke 3 anak, masing-masing 8 potong. Jika kue yang sama dibagi ke 6 anak, berapa potong tiap anak?",
+        "rows": [
+          [
+            3,
+            8
+          ],
+          [
+            6,
+            null
+          ]
+        ],
+        "answer": 4
+      }
+    },
+    {
+      "id": "M4-L4",
+      "phase": "latihan",
+      "type": "berbalik",
+      "context": "keran-waktu",
+      "text": "Bak mandi berisi 600 liter diisi 3 keran yang sama besar dalam 40 menit. Berapa menit jika memakai 4 keran yang sama?",
+      "marks": {
+        "relevant": [
+          "3",
+          "40",
+          "4"
+        ],
+        "distractors": [
+          "600"
+        ],
+        "question": "Berapa menit jika memakai 4 keran yang sama?"
+      },
+      "table": {
+        "columns": [
+          "Keran",
+          "Menit"
+        ],
+        "rows": [
+          [
+            3,
+            40
+          ],
+          [
+            4,
+            null
+          ]
+        ]
+      },
+      "answer": 30,
+      "swappedAnswer": 53.33,
+      "hints": [
+        "Apakah 600 liter perlu untuk menghitung? Baknya tetap sama.",
+        "Keran × menit tetap.",
+        "3 × 40 = 120. Lalu 120 : 4."
+      ],
+      "twin": {
+        "text": "Bak mandi berisi 500 liter diisi 2 keran yang sama besar dalam 60 menit. Berapa menit jika memakai 3 keran yang sama?",
+        "rows": [
+          [
+            2,
+            60
+          ],
+          [
+            3,
+            null
+          ]
+        ],
+        "answer": 40
+      }
+    },
+    {
+      "id": "M4-M1",
+      "phase": "mandiri",
+      "type": "berbalik",
+      "context": "pekerja-waktu",
+      "text": "Rumah selesai dibangun 12 tukang dalam 18 hari. Jika hanya 9 tukang, berapa hari?",
+      "marks": {
+        "relevant": [
+          "12",
+          "18",
+          "9"
+        ],
+        "distractors": [],
+        "question": "Jika hanya 9 tukang, berapa hari?"
+      },
+      "table": {
+        "columns": [
+          "Tukang",
+          "Hari"
+        ],
+        "rows": [
+          [
+            12,
+            18
+          ],
+          [
+            9,
+            null
+          ]
+        ]
+      },
+      "answer": 24,
+      "swappedAnswer": 13.5,
+      "hints": [
+        "Tukang berkurang, waktunya lebih cepat atau lebih lama?",
+        "Tukang × hari tetap."
+      ]
+    },
+    {
+      "id": "M4-M2",
+      "phase": "mandiri",
+      "type": "berbalik",
+      "context": "bagi-rata",
+      "text": "Siswa satu sekolah naik 6 bus, tiap bus 40 siswa. Jika memakai 8 bus, berapa siswa tiap bus?",
+      "marks": {
+        "relevant": [
+          "6",
+          "40",
+          "8"
+        ],
+        "distractors": [],
+        "question": "Jika memakai 8 bus, berapa siswa tiap bus?"
+      },
+      "table": {
+        "columns": [
+          "Bus",
+          "Siswa per bus"
+        ],
+        "rows": [
+          [
+            6,
+            40
+          ],
+          [
+            8,
+            null
+          ]
+        ]
+      },
+      "answer": 30,
+      "swappedAnswer": 53.33,
+      "hints": [
+        "Bus lebih banyak, isi tiap bus lebih banyak atau lebih sedikit?",
+        "Hitung semua siswa dulu."
+      ]
+    },
+    {
+      "id": "M4-M3",
+      "phase": "mandiri",
+      "type": "berbalik",
+      "context": "mesin-waktu",
+      "text": "5 mesin fotokopi yang sama mencetak pesanan dalam 36 menit. Harga sewa mesin Rp50.000. Berapa menit jika 4 mesin?",
+      "marks": {
+        "relevant": [
+          "5",
+          "36",
+          "4"
+        ],
+        "distractors": [
+          "50.000"
+        ],
+        "question": "Berapa menit jika 4 mesin?"
+      },
+      "table": {
+        "columns": [
+          "Mesin",
+          "Menit"
+        ],
+        "rows": [
+          [
+            5,
+            36
+          ],
+          [
+            4,
+            null
+          ]
+        ]
+      },
+      "answer": 45,
+      "swappedAnswer": 28.8,
+      "hints": [
+        "Apakah harga sewa dipakai?",
+        "Mesin × menit tetap."
+      ]
+    }
+  ],
+  "closing": "Kamu sudah bisa menghitung berbalik nilai. Ingat: berbalik nilai → hasil kali tetap. Berikutnya: soal cerita campuran."
+}

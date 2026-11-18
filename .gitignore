@@ -1,0 +1,26 @@
+# Data wawancara (memuat data pribadi; jangan di-commit)
+referensi/
+
+# Kode siswa hasil tools/generate_codes.py (jangan di-commit)
+kode-siswa/
+
+# Python
+__pycache__/
+.pytest_cache/
+.venv/
+
+# Rahasia lingkungan
+.env
+.env.local
+.env.*.local
+
+# Hasil build dan dependensi
+node_modules/
+dist/
+.netlify/
+.vercel/
+
+# Lain-lain
+.DS_Store
+Thumbs.db
+*.log
