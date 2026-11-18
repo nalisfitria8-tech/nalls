@@ -54,7 +54,7 @@ python -m pytest tools      # tes Python
 python tools/check_content.py                    # cek kunci semua soal
 ```
 
-**Menyalakan Tanya Nalls (Groq Free):** lihat [docs/panduan-groq.md](docs/panduan-groq.md). **Tahapan RMT:** [docs/rmt-isian.md](docs/rmt-isian.md) (menunggu dosen).
+**Mencoba Tanya Nalls tanpa akun/kunci:** `npm run tutor:tiruan` (mode tiruan). **Menghubungkan Groq Free nanti:** [docs/panduan-groq.md](docs/panduan-groq.md). **Tahapan RMT:** [docs/rmt-isian.md](docs/rmt-isian.md) (menunggu dosen).
 
 **Untuk uji coba di kelas (tes literasi):** lihat [docs/panduan-android.md](docs/panduan-android.md).
 

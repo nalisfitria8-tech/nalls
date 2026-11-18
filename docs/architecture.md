@@ -61,7 +61,7 @@ mathsave/
 ├─ index.html            halaman tunggal; memuat src/main.js
 ├─ netlify.toml          perintah build Netlify + folder fungsi (esbuild)
 ├─ netlify/functions/tutor.js  fungsi server Tanya Nalls: memanggil Groq, penjaga jawaban (F18, §12)
-├─ scripts/              alat uji Tanya Nalls tanpa Netlify: tutor-local.mjs (server lokal), tutor-eval.mjs (uji 3e), env.mjs (baca .env tanpa mencetak kunci)
+├─ scripts/              alat uji Tanya Nalls tanpa Netlify: tutor-local.mjs (server lokal; --tiruan), tutor-eval.mjs (uji 3e; --tiruan), mock-groq.mjs (Groq tiruan, hanya lokal), env.mjs (baca .env tanpa mencetak kunci)
 ├─ docs/                 dokumentasi (PRD, design, architecture, api, task, naskah, kisi-kisi, keputusan, evaluasi)
 ├─ referensi/            file wawancara (tidak di-deploy, dikecualikan dari git)
 ├─ src/
@@ -296,6 +296,7 @@ src/components/tutor.js ──POST JSON──────────► netlify
 - **Netlify Free:** 300 kredit/bulan dengan **batas keras**, tanpa isi ulang, tidak pernah ditagih. Jika kredit habis, **semua situs di tim dihentikan sementara** ("Site not available") sampai siklus berikutnya — termasuk materi dan tes, bukan hanya chatbot. Pemakaian fungsi dihitung sebagai *compute* 10 kredit per GB-jam (memori bawaan 1 GB): ±3 detik per permintaan ≈ 0,008 kredit → ±3.000 permintaan/bulan ≈ 25 kredit. Setiap **deploy produksi 15 kredit** (yang paling boros): batasi deploy selama uji coba dan pantau pemakaian kredit di dasbor. Permintaan web 2 kredit per 10.000.
 - **Jatah per perangkat (`store.tutor = { date, count }`)** hanya pembatasan sederhana: bisa dilewati dengan menghapus data browser, mode penyamaran, atau perangkat lain, dan alamat fungsi bisa dipanggil langsung. Karena paket gratis tanpa kartu, akibat terburuknya kuota habis (layanan berhenti sementara), **bukan tagihan**. Penghitung di server (Netlify Blobs) bisa ditambahkan nanti bila perlu.
 - **Privasi:** yang dikirim ke Groq hanya data soal, isian/kesalahan langkah, riwayat singkat dari memori panel, dan pesan siswa (email & nomor HP disamarkan). Tidak ada nama, kode peserta, atau kode perangkat. Isi percakapan tidak disimpan di perangkat, server, maupun log. Aktifkan *Zero Data Retention* di console Groq (Data Controls).
+- **Mode tiruan (tanpa akun/kunci/internet):** `npm run tutor:tiruan` (aplikasi + fungsi yang sama, Groq diganti `scripts/mock-groq.mjs`; balasan "[Tiruan]", kata uji `tes-ramai`/`tes-habis`/`tes-galat`) dan `npm run tutor:uji-tiruan`. Fungsi Netlify **tidak** punya mode tiruan.
 - **Uji lokal dengan Groq:** `npm run tutor:lokal` (server lokal + fungsi yang sama, kunci dari `.env`) dan `npm run tutor:uji` (16 percakapan contoh, laporan kebocoran/panjang/token; `--tiruan` tanpa jaringan). Langkah pemilik proyek: `docs/panduan-groq.md`.
 - **RMT:** tahapan dari `tutor.json → rmt` (teks atau `{ nama, deskripsi, langkah, contohPertanyaan }`); hanya tahapan untuk langkah siswa yang dikirim. Isian: `docs/rmt-isian.md` (menunggu dosen).
 - **Uji lokal:** `npm run preview` tidak menjalankan fungsi → panel menampilkan "tidak bisa dihubungi" (Petunjuk tetap jalan). Fungsi berjalan di situs Netlify atau `netlify dev`. Uji dengan Groq sungguhan = Tahap 3e (menunggu persetujuan pengembang).

@@ -1,49 +1,48 @@
-# Panduan Singkat: Menyalakan Tanya Nalls dengan Groq Free
+# Panduan Singkat: Tanya Nalls — Mode Tiruan dan Menghubungkan Groq Free
 
-Untuk pemilik proyek. **Tanpa biaya**: jangan memasukkan kartu/metode pembayaran dan jangan *upgrade* paket. Jika kuota gratis habis, Tanya Nalls hanya berhenti sementara (tombol Petunjuk tetap jalan).
+**Tanpa biaya.** Tidak perlu kartu atau data pembayaran. Jangan *upgrade* paket. Jika kuota gratis habis, Tanya Nalls hanya berhenti sementara (tombol **Petunjuk** tetap jalan).
 
-## A. Akun Groq (sekali, ±10 menit)
+## 1. Sekarang: Mode Tiruan (tanpa akun, tanpa kunci, tanpa internet)
 
-1. Daftar di **console.groq.com** (gratis). Lewati semua tawaran paket berbayar.
-2. **Settings → Limits**: catat batas untuk `openai/gpt-oss-120b` (RPM, RPD, TPM, TPD). Ini batas akun Anda yang sebenarnya.
-3. **Settings → Data Controls**: nyalakan **Zero Data Retention**.
-4. **API Keys → Create API Key** (nama: `nalls`). Salin kuncinya (hanya tampil sekali).
+| Perintah | Gunanya |
+|---|---|
+| `npm run tutor:tiruan` | Aplikasi + Tanya Nalls tiruan di `http://localhost:8888/#/soal/M3/2` |
+| `npm run tutor:tiruan -- --host` | Sama, bisa dibuka dari HP di Wi-Fi yang sama |
+| `npm run tutor:uji-tiruan` | 16 percakapan contoh otomatis + tabel laporan |
+| `npm test` | Semua tes otomatis (Groq selalu tiruan di tes) |
 
-## B. Simpan kunci di laptop (bukan di chat, bukan di GitHub)
+Yang bisa dicoba di mode tiruan:
+- Balasan diawali **"[Tiruan]"** — bukan AI sungguhan, hanya meniru format balasan per langkah.
+- Tulis "kasih jawabannya" → tiruan sengaja membocorkan jawaban → **penjaga server menggantinya dengan petunjuk** (sama seperti nanti dengan AI sungguhan).
+- Tulis `tes-ramai` → pesan "sedang ramai"; `tes-habis` → pesan "batas pemakaian hari ini"; `tes-galat` → "tidak bisa dihubungi". Jatah tidak berkurang untuk pesan-pesan ini.
+- Jatah 4 pertanyaan/hari per perangkat dan tombol Petunjuk.
 
-1. Di folder proyek, buat file bernama **`.env`** (bukan `.env.example`), isi:
+Mode tiruan **hanya ada di laptop** (folder `scripts/`). Fungsi server di Netlify tidak punya mode tiruan: tanpa kunci, situs menampilkan "tidak bisa dihubungi".
+
+## 2. Nanti: menghubungkan kunci Groq (setelah akun dan izin tersedia)
+
+Lakukan hanya jika sudah siap; tidak ada yang perlu diubah di kode.
+
+1. **Akun Groq (gratis):** daftar di console.groq.com, lewati semua tawaran berbayar, jangan isi data pembayaran.
+2. **Settings → Limits:** catat batas `openai/gpt-oss-120b` (RPM, RPD, TPM, TPD).
+3. **Settings → Data Controls:** nyalakan **Zero Data Retention**.
+4. **API Keys → Create API Key** (nama `nalls`); salin (hanya tampil sekali).
+5. Di folder proyek buat file **`.env`** (bukan `.env.example`):
    ```
    GROQ_API_KEY=tempel-kunci-di-sini
    TUTOR_ENABLED=true
    ```
-2. Periksa: `git status` **tidak** boleh menampilkan `.env` (sudah dikecualikan `.gitignore`).
-3. Jangan mengirim kunci lewat chat, WhatsApp, atau dokumen tugas.
+   `git status` tidak boleh menampilkan `.env`. Jangan kirim kunci lewat chat, WhatsApp, atau dokumen.
+6. Uji: `npm run tutor:uji -- --maks 4` (±4 permintaan), lalu `npm run tutor:uji` (16 permintaan, jeda 9 detik agar < 8K token/menit), lalu coba sendiri `npm run tutor:lokal`.
+7. Kirim ke Claude **tanpa kunci**: angka dari langkah 2 dan tabel ringkasan langkah 6 → jatah per siswa (`src/content/tutor.json`, sekarang 4/hari) disesuaikan.
 
-## C. Uji (tanpa Netlify)
+## 3. Nanti: Netlify Free (setelah uji lokal)
 
-| Perintah | Gunanya | Pemakaian kuota |
-|---|---|---|
-| `npm run tutor:uji -- --maks 4` | Uji singkat 4 percakapan contoh | ±4 permintaan |
-| `npm run tutor:uji` | Uji lengkap 16 percakapan (jeda 9 detik agar < 8K token/menit) | ±16 permintaan, ±16–20 ribu token |
-| `npm run tutor:lokal` | Aplikasi + Tanya Nalls di `http://localhost:8888/#/soal/M3/2` | 1 per pertanyaan |
-| `npm run tutor:lokal -- --host` | Sama, bisa dibuka dari HP di Wi-Fi yang sama | 1 per pertanyaan |
+1. Akun **Netlify Free** (tanpa kartu; batas keras 300 kredit/bulan, tidak pernah menagih; jika habis, situs berhenti sementara).
+2. Unggah situs (Netlify CLI atau GitHub — GitHub butuh persetujuan push lebih dulu).
+3. **Site configuration → Environment variables:** `GROQ_API_KEY` (centang *Contains secret values*), `TUTOR_ENABLED` = `true`.
+4. Hemat kredit: tiap deploy produksi 15 kredit.
 
-Skrip uji mencetak tabel: status, jumlah kata, pertanyaan balik, **jawaban akhir lolos (harus 0)**, dan token per permintaan. Kunci tidak pernah dicetak.
-
-## D. Kirim ke Claude (tanpa kunci)
-
-- Angka batas dari **Settings → Limits** (langkah A2).
-- Ringkasan tabel dari `npm run tutor:uji` (boleh disalin apa adanya).
-
-Dari situ jatah per siswa (sekarang 4/hari, `src/content/tutor.json`) disesuaikan.
-
-## E. Netlify (setelah uji lokal berhasil)
-
-1. Buat akun **Netlify Free** (tanpa kartu). Paket Free punya batas keras 300 kredit/bulan dan tidak pernah menagih; jika habis, situs berhenti sementara.
-2. Unggah situs lewat Netlify CLI (`npx netlify-cli deploy`) atau dari GitHub (butuh persetujuan push lebih dulu).
-3. **Site configuration → Environment variables**: `GROQ_API_KEY` (centang *Contains secret values*), `TUTOR_ENABLED` = `true`.
-4. Hemat kredit: setiap deploy produksi 15 kredit — deploy seperlunya.
-
-## F. Jika kunci bocor
+## 4. Jika kunci bocor
 
 Groq console → **API Keys** → hapus kunci itu → buat baru → ganti di `.env` dan Netlify. Tidak perlu mengubah kode.

@@ -4,8 +4,9 @@
  *   - meneruskan POST /.netlify/functions/tutor ke fungsi server yang sama dengan Netlify.
  * Kunci dibaca dari .env (tidak di-commit) dan tidak pernah dicetak.
  *
- *   npm run tutor:lokal                 → http://localhost:8888 (hanya laptop ini)
- *   npm run tutor:lokal -- --host       → juga bisa dibuka dari HP di Wi-Fi yang sama
+ *   npm run tutor:tiruan                → MODE TIRUAN: tanpa akun/kunci/internet (balasan "[Tiruan] …")
+ *   npm run tutor:lokal                 → Groq sungguhan dengan kunci di .env (setelah ada izin & akun)
+ *   tambahkan  -- --host                → juga bisa dibuka dari HP di Wi-Fi yang sama
  */
 import { createServer } from 'node:http';
 import { readFileSync, existsSync, statSync } from 'node:fs';
@@ -13,19 +14,40 @@ import { join, extname, resolve } from 'node:path';
 import { networkInterfaces } from 'node:os';
 import { loadEnv, describeEnv } from './env.mjs';
 import { loadTutorFunction } from './bundle-tutor.mjs';
+import { mockGroqFetch } from './mock-groq.mjs';
 
 const root = process.cwd();
 const host = process.argv.includes('--host') ? '0.0.0.0' : '127.0.0.1';
 const port = Number(process.env.PORT || 8888);
+const mock = process.argv.includes('--tiruan');
 
-loadEnv(resolve(root, '.env'));
-console.log(describeEnv());
+if (mock) {
+  console.log('MODE TIRUAN: tanpa akun Groq, tanpa kunci, tanpa internet, tanpa biaya. Balasan diawali "[Tiruan]".');
+} else {
+  loadEnv(resolve(root, '.env'));
+  console.log(describeEnv());
+}
 if (!existsSync(join(root, 'dist', 'index.html'))) {
   console.error('dist/ belum ada. Jalankan: npm run build');
   process.exit(1);
 }
 
-const { default: handler } = await loadTutorFunction(root);
+const fn = await loadTutorFunction(root);
+// mode tiruan: fungsi & penjaga yang sama, hanya panggilan ke Groq diganti tiruan (kunci palsu tidak pernah dikirim ke mana pun)
+const MOCK_ENV = { TUTOR_ENABLED: 'true', GROQ_API_KEY: 'tiruan' };
+const handler = mock
+  ? async (request) => {
+      if (request.method !== 'POST') return fn.default(request);
+      let body;
+      try {
+        body = JSON.parse(await request.text());
+      } catch {
+        return new Response(JSON.stringify({ status: 'invalid' }), { status: 400 });
+      }
+      const out = await fn.handleTutor(body, { env: MOCK_ENV, fetchImpl: mockGroqFetch });
+      return new Response(JSON.stringify(out.body), { status: out.httpStatus, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
+    }
+  : fn.default;
 const toml = readFileSync(join(root, 'netlify.toml'), 'utf8');
 const headers = Object.fromEntries([...(toml.split('[headers.values]')[1] ?? '').matchAll(/^\s*([A-Za-z-]+)\s*=\s*"([^"]*)"/gm)].map((m) => [m[1], m[2]]));
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml' };

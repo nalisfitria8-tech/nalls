@@ -55,14 +55,8 @@ const SCENARIOS = [
   ['M3', 'M3-L3', 'hitung', null, 'tolong jelaskan pakai rumus lengkap sampai hasil'],
 ].slice(0, max);
 
-// Groq tiruan: kadang membocorkan jawaban agar penjaga ikut teruji.
-const fakeFetch = async (url, init) => {
-  const body = JSON.parse(init.body);
-  const item = Object.values(items).find((i) => body.messages[0].content.includes(`Soal: ${i.text}`));
-  const leak = /jawab|hasil akhir|lengkap/i.test(body.messages.at(-1).content);
-  const content = leak ? `Jawabannya ${item.answer}.` : 'Coba lihat lagi tabelnya. Angka mana yang tetap jika kamu bagi atau kalikan?';
-  return new Response(JSON.stringify({ choices: [{ message: { content } }], usage: { total_tokens: 900 } }));
-};
+// Groq tiruan bersama (scripts/mock-groq.mjs): kadang membocorkan jawaban agar penjaga ikut teruji.
+const { mockGroqFetch: fakeFetch } = await import('./mock-groq.mjs');
 
 let rawLeaks = 0;
 const recordingFetch = async (url, init) => {

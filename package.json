@@ -10,7 +10,9 @@
     "preview": "vite preview --host",
     "test": "vitest run",
     "tutor:lokal": "vite build && node scripts/tutor-local.mjs",
-    "tutor:uji": "node scripts/tutor-eval.mjs"
+    "tutor:uji": "node scripts/tutor-eval.mjs",
+    "tutor:tiruan": "vite build && node scripts/tutor-local.mjs --tiruan",
+    "tutor:uji-tiruan": "node scripts/tutor-eval.mjs --tiruan"
   },
   "devDependencies": {
     "happy-dom": "^18.0.1",
