@@ -10,3 +10,15 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+
+# Header keamanan untuk semua halaman (D1). Aplikasi hanya memuat berkas dari situs sendiri;
+# Tanya Nalls memanggil /.netlify/functions/tutor (situs sendiri), Groq dipanggil dari server.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "no-referrer"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    Cross-Origin-Opener-Policy = "same-origin"
