@@ -54,6 +54,8 @@ python -m pytest tools      # tes Python
 python tools/check_content.py                    # cek kunci semua soal
 ```
 
+**Menyalakan Tanya Nalls (Groq Free):** lihat [docs/panduan-groq.md](docs/panduan-groq.md). **Tahapan RMT:** [docs/rmt-isian.md](docs/rmt-isian.md) (menunggu dosen).
+
 **Untuk uji coba di kelas (tes literasi):** lihat [docs/panduan-android.md](docs/panduan-android.md).
 
 **Mencoba di HP Android:** sambungkan HP dan laptop ke Wi-Fi yang sama, jalankan `npm run dev`, lalu buka alamat **Network** yang muncul (misal `http://192.168.1.5:5173`) di Chrome HP.

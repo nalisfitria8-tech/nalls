@@ -326,3 +326,19 @@ def test_skor_maksimum_tes_literasi_28():
     import json
     t = json.loads((cc.CONTENT_DIR / "ml-test.json").read_text(encoding="utf-8"))
     assert t["maxScore"] + len(_mcq()) == 28  # 24 uraian + 4 PG
+
+
+def test_tutor_rmt_format_bertahap_divalidasi():
+    # nama tahapan di bawah HANYA contoh uji, bukan tahapan RMT sungguhan
+    ok = _tutor()
+    ok["rmt"] = {"status": "dari dosen", "sumber": "Contoh uji", "catatan": "", "tahapan": [
+        "Contoh teks", {"nama": "Contoh objek", "deskripsi": "x", "langkah": ["hitung"], "contohPertanyaan": ["?"]}]}
+    assert cc.check_tutor(ok) == []
+    bad = _tutor()
+    bad["rmt"] = {"status": "perlu dilengkapi", "sumber": "Contoh uji", "tahapan": [
+        {"nama": "A", "langkah": ["bentuk"]}, {"deskripsi": "tanpa nama"}, {"nama": "B", "warna": "x"}]}
+    errors = cc.check_tutor(bad)
+    assert any("masih 'perlu dilengkapi'" in e for e in errors)
+    assert any("ke-1" in e and "'langkah'" in e for e in errors)
+    assert any("ke-2" in e and "'nama'" in e for e in errors)
+    assert any("ke-3" in e and "tidak dikenal" in e for e in errors)

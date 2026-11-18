@@ -101,14 +101,37 @@ export function trimHistory(history, turns, maxChars = 300) {
 }
 
 /**
+ * Tahapan RMT (Rigorous Mathematical Thinking) yang berlaku untuk langkah ini.
+ * Isi HANYA dari rangkuman resmi dosen (tutor.json → rmt; diperiksa check_content.py).
+ * Bentuk tahapan: teks, atau { nama, deskripsi?, langkah?: ['diketahui'|'ditanya'|'jenis'|'hitung'],
+ * contohPertanyaan?: [...] }. Tanpa `langkah` = berlaku di semua langkah. Hanya tahapan yang
+ * relevan dikirim, agar informasi untuk AI (dan balasannya) tetap ringkas.
+ */
+export function rmtForStep(rmt, step) {
+  const all = Array.isArray(rmt?.tahapan) ? rmt.tahapan : [];
+  return all
+    .map((t, i) => (typeof t === 'string' ? { no: i + 1, nama: t } : { no: i + 1, ...t }))
+    .filter((t) => t.nama && (!Array.isArray(t.langkah) || t.langkah.includes(step)));
+}
+
+function rmtRule(rmt, step) {
+  const stages = rmtForStep(rmt, step);
+  if (!stages.length) return null;
+  const parts = stages.map((t) => {
+    const ask = t.contohPertanyaan?.length ? ` Contoh pertanyaan: "${t.contohPertanyaan[0]}"` : '';
+    return `${t.no}) ${t.nama}${t.deskripsi ? `: ${t.deskripsi}` : ''}.${ask}`;
+  });
+  return `Bimbing dengan tahapan RMT dari dosen (${rmt.sumber}). Untuk langkah ini: ${parts.join(' ')} Tetap satu tahap per balasan.`;
+}
+
+/**
  * Menyusun pesan untuk layanan AI.
  * tutor = isi tutor.json; rmt hanya dipakai jika tahapan resmi sudah diisi.
  */
 export function buildMessages(tutor, item, { step, errorType, hintLevel, history, message }) {
   const rules = [...tutor.rules, tutor.stepFocus[step]];
-  if (tutor.rmt?.tahapan?.length) {
-    rules.push(`Tahapan RMT dari dosen (ikuti urutannya): ${tutor.rmt.tahapan.join(' → ')}`);
-  }
+  const rmt = rmtRule(tutor.rmt, step);
+  if (rmt) rules.push(rmt);
   return [
     { role: 'system', content: `${rules.join('\n')}\n\n${itemContext(item, { step, errorType, hintLevel })}` },
     ...trimHistory(history, tutor.settings.historyTurns),

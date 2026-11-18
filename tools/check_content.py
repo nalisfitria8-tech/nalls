@@ -327,8 +327,30 @@ def check_tutor(data: dict) -> list[str]:
         if any(term in text.lower() for term in LEARNING_THEORY_TERMS):
             errors.append(f"tutor: pesan '{key}' memuat istilah teori belajar")
     rmt = data.get("rmt", {})
-    if rmt.get("tahapan") and not rmt.get("sumber"):
+    stages = rmt.get("tahapan") or []
+    if not isinstance(stages, list):
+        errors.append("tutor: rmt.tahapan harus daftar")
+        stages = []
+    if stages and not rmt.get("sumber"):
         errors.append("tutor: tahapan RMT diisi tanpa sumber resmi dari dosen")
+    if stages and rmt.get("status") == "perlu dilengkapi":
+        errors.append("tutor: rmt.status masih 'perlu dilengkapi' padahal tahapan sudah diisi")
+    for n, st in enumerate(stages, start=1):
+        if isinstance(st, str):
+            if not st.strip():
+                errors.append(f"tutor: tahapan RMT ke-{n} kosong")
+            continue
+        if not (isinstance(st, dict) and isinstance(st.get("nama"), str) and st["nama"].strip()):
+            errors.append(f"tutor: tahapan RMT ke-{n} harus teks atau objek dengan 'nama'")
+            continue
+        unknown = set(st) - {"nama", "deskripsi", "langkah", "contohPertanyaan"}
+        if unknown:
+            errors.append(f"tutor: tahapan RMT ke-{n} kunci tidak dikenal {sorted(unknown)}")
+        steps = st.get("langkah")
+        if steps is not None and not (isinstance(steps, list) and steps and set(steps) <= set(TUTOR_STEPS)):
+            errors.append(f"tutor: tahapan RMT ke-{n} 'langkah' harus bagian dari {TUTOR_STEPS}")
+        if any(len(str(st.get(k, "")).split()) > 40 for k in ("nama", "deskripsi")):
+            errors.append(f"tutor: tahapan RMT ke-{n} terlalu panjang (> 40 kata)")
     return errors
 
 

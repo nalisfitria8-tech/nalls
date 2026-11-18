@@ -4,7 +4,7 @@ import m3 from '../src/content/m3.json';
 import m4 from '../src/content/m4.json';
 import {
   TUTOR_STEPS, STATUS, STATUS_MESSAGE, tutorAllowed, redactPersonal, sanitizeMessage, itemContext, trimHistory,
-  buildMessages, numbersIn, leaksAnswer, plainText, limitWords, fallbackReply, finalizeReply, dayKey, quotaStatus, consumeQuota,
+  buildMessages, rmtForStep, numbersIn, leaksAnswer, plainText, limitWords, fallbackReply, finalizeReply, dayKey, quotaStatus, consumeQuota,
 } from '../src/engine/tutorPolicy.js';
 
 const item = (id) => [...m3.items, ...m4.items].find((i) => i.id === id);
@@ -69,8 +69,30 @@ describe('pesan untuk layanan AI', () => {
   it('RMT: tahapan kosong tidak dikirim; jika nanti diisi dosen, ikut aturan', () => {
     const base = buildMessages(tutor, L1, { step: 'hitung', history: [], message: 'x' })[0].content;
     expect(base).not.toContain('RMT');
-    const filled = { ...tutor, rmt: { ...tutor.rmt, tahapan: ['Tahap A', 'Tahap B'] } };
-    expect(buildMessages(filled, L1, { step: 'hitung', history: [], message: 'x' })[0].content).toContain('Tahap A → Tahap B');
+    // nama tahapan di bawah HANYA contoh uji (bukan tahapan RMT sungguhan)
+    const filled = { ...tutor, rmt: { ...tutor.rmt, sumber: 'Contoh uji', tahapan: ['Tahap contoh A', 'Tahap contoh B'] } };
+    const sys = buildMessages(filled, L1, { step: 'hitung', history: [], message: 'x' })[0].content;
+    expect(sys).toContain('tahapan RMT dari dosen (Contoh uji)');
+    expect(sys).toContain('1) Tahap contoh A. 2) Tahap contoh B.');
+  });
+
+  it('RMT per langkah: hanya tahapan yang berlaku untuk langkah siswa yang dikirim (ringkas)', () => {
+    const rmt = {
+      sumber: 'Contoh uji',
+      tahapan: [
+        { nama: 'Contoh X', deskripsi: 'penjelasan X', langkah: ['diketahui', 'ditanya'] },
+        { nama: 'Contoh Y', langkah: ['hitung'], contohPertanyaan: ['Pertanyaan Y?', 'tidak dipakai'] },
+        { nama: 'Contoh Z' }, // tanpa langkah = semua langkah
+      ],
+    };
+    expect(rmtForStep(rmt, 'hitung').map((t) => t.nama)).toEqual(['Contoh Y', 'Contoh Z']);
+    expect(rmtForStep(rmt, 'diketahui').map((t) => t.nama)).toEqual(['Contoh X', 'Contoh Z']);
+    const sys = buildMessages({ ...tutor, rmt }, L1, { step: 'hitung', history: [], message: 'x' })[0].content;
+    expect(sys).toContain('2) Contoh Y. Contoh pertanyaan: "Pertanyaan Y?"');
+    expect(sys).toContain('3) Contoh Z.');
+    expect(sys).not.toContain('Contoh X');
+    expect(sys).not.toContain('tidak dipakai');
+    expect(rmtForStep(undefined, 'hitung')).toEqual([]);
   });
 
   it('data soal ringkas: teks, tabel, jenis', () => {
