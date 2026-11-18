@@ -4,3 +4,9 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+# Fungsi server (Tanya Nalls). Kunci GROQ_API_KEY diatur di dasbor Netlify,
+# JANGAN ditulis di file ini (file ini masuk Git).
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
