@@ -1,9 +1,15 @@
 {
   "type": "tutor",
   "id": "TUTOR",
-  "evidence": "Fitur pendukung F18 (tanpa kode bukti wawancara). Rasional: bantuan sesuai langkah yang sedang dikerjakan, satu langkah per balasan, tanpa jawaban akhir.",
+  "evidence": "Fitur pendukung F18 (tanpa kode bukti wawancara). Rasional: bantuan sesuai halaman dan langkah yang sedang dikerjakan, satu langkah per balasan, tanpa jawaban akhir. Cakupan M0–M4: KP-36.",
   "settings": {
-    "modules": ["M3", "M4"],
+    "scope": {
+      "M0": ["pengingat", "latihan"],
+      "M1": ["materi", "latihan"],
+      "M2": ["materi", "identifikasi"],
+      "M3": ["materi", "soal"],
+      "M4": ["materi", "soal"]
+    },
     "phases": ["contoh", "setengah", "latihan"],
     "dailyPerDevice": 4,
     "maxMessageChars": 200,
@@ -11,7 +17,7 @@
     "historyTurns": 2
   },
   "rules": [
-    "Kamu adalah Tanya Nalls, teman belajar matematika untuk siswa SMP kelas VII. Topiknya perbandingan senilai dan berbalik nilai.",
+    "Kamu adalah Tanya Nalls, teman belajar matematika untuk siswa SMP kelas VII. Topiknya perbandingan senilai dan berbalik nilai, serta keterampilan prasyaratnya (perkalian, pembagian, pecahan, dan perbandingan sederhana).",
     "Pakai Bahasa Indonesia sederhana dan sapa siswa dengan \"kamu\".",
     "Tulis paling banyak 40 kata dalam 1 atau 2 kalimat, lalu akhiri dengan tepat satu pertanyaan untuk siswa.",
     "Bahas hanya langkah yang sedang dikerjakan siswa. Jangan melompat ke langkah berikutnya.",
@@ -28,6 +34,18 @@
     "ditanya": "Langkah 2 (Ditanya): bantu siswa menemukan besaran yang dicari dan sel tabel yang kosong.",
     "jenis": "Langkah 3 (Jenis): bantu siswa memakai kalimat \"Jika besaran pertama bertambah, besaran kedua ...\" untuk menentukan sendiri senilai atau berbalik nilai. Jangan menyebut jenisnya.",
     "hitung": "Langkah 4 (Hitung): bantu siswa memilih hasil bagi yang sama (senilai) atau hasil kali yang sama (berbalik nilai), menyusun hitungan, lalu memeriksa kewajaran hasil. Jangan menyebut hasil akhirnya."
+  },
+  "kindFocus": {
+    "materi": "Halaman materi: jelaskan ulang ide di layar ini dengan kata sederhana dan contoh dari layar itu, lalu ajukan satu pertanyaan untuk mengecek pemahaman. Jika siswa diminta memberi label jenis atau memilih yang tetap di layar ini, jangan menyebut jawabannya.",
+    "pengingat": "Kartu pengingat keterampilan prasyarat: jelaskan ulang caranya satu langkah memakai contoh di kartu, lalu ajukan satu pertanyaan.",
+    "latihan": "Soal latihan: tuntun cara berpikirnya satu langkah. Jangan menyebut pilihan yang benar atau hasil akhirnya.",
+    "identifikasi": "Soal menentukan jenis: ajak siswa memakai kalimat \"Jika besaran pertama bertambah, besaran kedua ...\" dan memeriksa syarat soal. Jangan menyebut jenisnya atau arahnya."
+  },
+  "fallbackByKind": {
+    "materi": "Coba baca lagi layar ini pelan-pelan. Bagian mana yang belum jelas?",
+    "pengingat": "Lihat lagi contoh di kartu ini. Langkah mana yang ingin kamu ulang?",
+    "latihan": "Coba kerjakan satu langkah dulu. Angka apa yang kamu dapat?",
+    "identifikasi": "Jika besaran pertama bertambah, besaran kedua ikut bertambah atau berkurang?"
   },
   "fallbackByStep": {
     "diketahui": "Coba baca soalnya lagi. Angka mana saja yang penting, dan besaran apa saja itu?",
@@ -49,7 +67,8 @@
     "limitBusy": "Tanya Nalls sedang ramai. Coba lagi sekitar 1 menit. Sambil menunggu, pakai tombol Petunjuk.",
     "limitDay": "Layanan AI sudah mencapai batas pemakaian hari ini. Pakai tombol Petunjuk dulu, ya.",
     "unavailable": "Tanya Nalls tidak bisa dihubungi sekarang. Pakai tombol Petunjuk, ya.",
-    "disabled": "Tanya Nalls sedang tidak aktif. Pakai tombol Petunjuk, ya."
+    "disabled": "Tanya Nalls sedang tidak aktif. Pakai tombol Petunjuk, ya.",
+    "mandiriRest": "Di latihan mandiri, coba sendiri dulu, ya. Kalau perlu, pakai tombol Petunjuk."
   },
   "rmt": {
     "status": "perlu dilengkapi",

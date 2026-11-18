@@ -83,7 +83,8 @@ mathsave/
 │  │  ├─ markedText.js   teks soal yang angka dan kalimatnya bisa ditandai (F07, KP-26)
 │  │  ├─ question.js     soal pilihan/isian, kotak umpan balik, kotak petunjuk, bilah atas
 │  │  ├─ explain.js      "Jelaskan ke temanmu": kalimat rumpang + teks bebas + daftar cek (F11)
-│  │  ├─ tutor.js        panel Tanya Nalls + jatah per perangkat + pengirim ke fungsi server (F18)
+│  │  ├─ tutor.js        tombol mengambang & panel Tanya Nalls + jatah per perangkat + pengirim ke fungsi server (F18, KP-36)
+│  │  ├─ tutorContext.js konteks halaman untuk Tanya Nalls (diisi layar, dikosongkan router)
 │  │  └─ navBar.js       Kembali · Ulangi · Lanjut (F06)
 │  ├─ engine/            logika murni tanpa DOM (diuji Vitest)
 │  │  ├─ number.js       membaca/menulis angka format Indonesia (12.000; 26,67)
@@ -95,7 +96,8 @@ mathsave/
 │  │  ├─ attempts.js     percobaan cek M2: kunci jawaban pertama, tutup & catat sekali (KP-25)
 │  │  ├─ mlScore.js      tes literasi: skor per tahap rubrik, ringkasan fase, N-gain, CSV (F17)
 │  │  ├─ marking.js      F07: memecah teks soal jadi kalimat & angka, menaruh angka di tabel Diketahui
-│  │  ├─ tutorPolicy.js  Tanya Nalls: tempat, pesan ringkas, penjaga jawaban akhir, batas kata, jatah (F18)
+│  │  ├─ tutorPolicy.js  Tanya Nalls: cakupan, konteks per jenis halaman, penjaga (angka, perbandingan, pilihan, jenis), batas kata, jatah (F18)
+│  │  ├─ tutorTargets.js Tanya Nalls: mencari halaman/soal dari konten server berdasarkan rujukan (KP-36)
 │  │  └─ path.js         skor diagnostik, titik mulai, status modul, gerbang mandiri (F02, DS02)
 │  ├─ data/
 │  │  ├─ store.js        keadaan belajar di localStorage (sementara sampai C5/C15)
@@ -300,3 +302,12 @@ src/components/tutor.js ──POST JSON──────────► netlify
 - **Uji lokal dengan Groq:** `npm run tutor:lokal` (server lokal + fungsi yang sama, kunci dari `.env`) dan `npm run tutor:uji` (16 percakapan contoh, laporan kebocoran/panjang/token; `--tiruan` tanpa jaringan). Langkah pemilik proyek: `docs/panduan-groq.md`.
 - **RMT:** tahapan dari `tutor.json → rmt` (teks atau `{ nama, deskripsi, langkah, contohPertanyaan }`); hanya tahapan untuk langkah siswa yang dikirim. Isian: `docs/rmt-isian.md` (menunggu dosen).
 - **Uji lokal:** `npm run preview` tidak menjalankan fungsi → panel menampilkan "tidak bisa dihubungi" (Petunjuk tetap jalan). Fungsi berjalan di situs Netlify atau `netlify dev`. Uji dengan Groq sungguhan = Tahap 3e (menunggu persetujuan pengembang).
+
+### 12.1 Tombol mengambang M0–M4 (KP-36)
+
+- `main.js` memasang **satu** tombol (`createTutorWidget`) dan **mengosongkan konteks setiap pindah halaman**; layar yang tercakup memasangnya lagi (`setTutorContext`):
+  `lesson.js` (materi M1–M4) · `diagnostic.js` hanya `reminderScreen` (pengingat & cek kartu M0) · `quiz.js` (latihan M1) · `m2.js` hanya `practiceScreen` · `solve.js` (soal; mandiri → `kind: "mandiri"`).
+  Halaman lain tidak memasang konteks → tombol tersembunyi & panel tertutup.
+- Permintaan: `{ module, kind, ref, twin, step, errorType, hintLevel, history, message }`. Server mencari target di kontennya sendiri (`tutorTargets.js`); diagnostik M0, `check`/`quick` M2, soal mandiri/akhir **tidak pernah** ditemukan → `invalid`.
+- Penjaga (`guardsFor`): soal → angka kunci (+ pasangan jenis sebelum Langkah 4) · latihan → angka atau teks/perbandingan kunci · identifikasi → pasangan jenis & arah · M2-06 → pasangan jenis & yang tetap · materi lain → tanpa kunci (konsep boleh dijelaskan).
+- Tata letak: HP lembar dari bawah; ≥ 600 px kartu di kanan bawah selebar ruang kosong samping kolom (min. 300 px); di ≥ 1280 px panel tidak menutupi kolom.

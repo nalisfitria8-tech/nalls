@@ -299,7 +299,16 @@ def check_label_tables(screen: dict) -> list[str]:
 
 
 TUTOR_STEPS = ["diketahui", "ditanya", "jenis", "hitung"]
-TUTOR_MESSAGES = ["intro", "invalid", "limitDevice", "limitBusy", "limitDay", "unavailable", "disabled"]
+TUTOR_MESSAGES = ["intro", "invalid", "limitDevice", "limitBusy", "limitDay", "unavailable", "disabled", "mandiriRest"]
+# Cakupan M0–M4 (KP-36): jenis halaman yang boleh per modul. Diagnostik, cek M2, tes TIDAK pernah.
+TUTOR_KIND_BY_MODULE = {
+    "M0": {"pengingat", "latihan"},
+    "M1": {"materi", "latihan"},
+    "M2": {"materi", "identifikasi"},
+    "M3": {"materi", "soal"},
+    "M4": {"materi", "soal"},
+}
+TUTOR_PAGE_KINDS = ["materi", "pengingat", "latihan", "identifikasi"]
 LEARNING_THEORY_TERMS = ["cognitive", "kognitif", "clt", "intrinsic", "extraneous", "germane", "beban"]
 
 
@@ -312,12 +321,29 @@ def check_tutor(data: dict) -> list[str]:
             errors.append(f"tutor: settings.{key} harus bilangan bulat positif")
     if "mandiri" in s.get("phases", []) or "akhir" in s.get("phases", []):
         errors.append("tutor: chatbot tidak boleh aktif di fase mandiri/akhir")
+    scope = s.get("scope", {})
+    if not isinstance(scope, dict) or not scope:
+        errors.append("tutor: settings.scope (cakupan per modul) kosong")
+        scope = {}
+    for module, kinds in scope.items():
+        allowed = TUTOR_KIND_BY_MODULE.get(module)
+        if allowed is None:
+            errors.append(f"tutor: modul {module} di luar cakupan M0–M4")
+        elif not (isinstance(kinds, list) and set(kinds) <= allowed):
+            errors.append(f"tutor: scope.{module} hanya boleh {sorted(allowed)} (diagnostik/cek/tes tidak boleh)")
     if not data.get("rules"):
         errors.append("tutor: rules kosong")
     for group in ["stepFocus", "fallbackByStep"]:
         if list(data.get(group, {}).keys()) != TUTOR_STEPS:
             errors.append(f"tutor: {group} harus berisi {TUTOR_STEPS}")
-    shown = {**data.get("messages", {}), **{f"fallback.{k}": v for k, v in data.get("fallbackByStep", {}).items()}}
+    for group in ["kindFocus", "fallbackByKind"]:
+        if list(data.get(group, {}).keys()) != TUTOR_PAGE_KINDS:
+            errors.append(f"tutor: {group} harus berisi {TUTOR_PAGE_KINDS}")
+    shown = {
+        **data.get("messages", {}),
+        **{f"fallback.{k}": v for k, v in data.get("fallbackByStep", {}).items()},
+        **{f"fallbackKind.{k}": v for k, v in data.get("fallbackByKind", {}).items()},
+    }
     for key in TUTOR_MESSAGES:
         if not data.get("messages", {}).get(key):
             errors.append(f"tutor: pesan '{key}' kosong")

@@ -17,10 +17,8 @@ import { maxHintLevel, registerWrong } from '../engine/hints.js';
 import { formatNumber, parseNumber } from '../engine/number.js';
 import { emptyCells, placeNumber, clearCell, cellsToResponse } from '../engine/marking.js';
 import { logStep, logHint, logEvent } from '../data/logger.js';
-import { tutorPanel, sendTutorRequest } from '../components/tutor.js';
-import { tutorAllowed } from '../engine/tutorPolicy.js';
-import { store } from '../data/store.js';
-import tutorContent from '../content/tutor.json';
+import { setTutorContext } from '../components/tutorContext.js';
+import { TUTOR_STEPS } from '../engine/tutorPolicy.js';
 
 const STEP_NAMES = ['Diketahui', 'Ditanya', 'Jenis', 'Hitung'];
 
@@ -49,20 +47,26 @@ export function initialState(item) {
   return s;
 }
 
-export function solveScreen({ lesson, index, recallCard, go, onFinish, tutorSend = sendTutorRequest }) {
+export function solveScreen({ lesson, index, recallCard, go, onFinish }) {
   const items = lesson.items;
   let item = items[index];
   let s = initialState(item);
-  // Tanya Nalls (F18): hanya fase terbimbing M3–M4, bukan soal kembar (angkanya beda dari data server)
-  const tutor = tutorAllowed(tutorContent.settings, lesson.module, item)
-    ? tutorPanel({
-        tutor: tutorContent,
-        moduleId: lesson.module,
-        store,
-        send: tutorSend,
-        context: () => ({ item, step: s.step, errorType: s.lastError, hintLevel: s.hint }),
-      })
-    : null;
+  const baseId = item.id;
+
+  /** Tanya Nalls (KP-36): langkah, kesalahan terakhir, dan petunjuk yang sedang dibuka. Mandiri: tanpa AI. */
+  function shareTutorContext() {
+    const step = TUTOR_STEPS[(typeof s.step === 'number' ? s.step : 4) - 1];
+    setTutorContext({
+      module: lesson.module,
+      kind: item.phase === 'mandiri' ? 'mandiri' : 'soal',
+      ref: baseId,
+      twin: Boolean(item.isTwin),
+      phase: item.phase,
+      step,
+      errorType: s.lastError ?? null,
+      hintLevel: s.hint,
+    });
+  }
   const container = h('div', { class: 'solve' });
   const isLast = index === items.length - 1;
   const nextHash = () => (isLast ? null : `#/soal/${lesson.module}/${index + 1}`);
@@ -380,6 +384,7 @@ export function solveScreen({ lesson, index, recallCard, go, onFinish, tutorSend
   }
 
   function draw() {
+    shareTutorContext();
     const inStep = typeof s.step === 'number';
     const body = s.step === 1 ? step1() : s.step === 2 ? step2() : s.step === 3 ? step3() : s.step === 4 ? step4() : s.step === 'done' ? doneView() : solutionView();
     const nextBtn = h('button', { type: 'button', class: 'primary', onClick: () => (nextHash() ? go(nextHash()) : onFinish()) }, isLast ? 'Selesai' : 'Soal berikut');
@@ -412,7 +417,6 @@ export function solveScreen({ lesson, index, recallCard, go, onFinish, tutorSend
             } }, 'ⓘ Ingat lagi: cara menentukan jenis')
           : null,
         recallView(),
-        tutor && inStep && !item.isTwin ? tutor.el : null,
         inStep ? hintBox({ hints: item.hints || [], level: s.hint, max: max(), onMore: () => {
           s.hint += 1;
           logHint({ item_id: item.id, step: `langkah${s.step}`, level: s.hint });

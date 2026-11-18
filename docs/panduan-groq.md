@@ -6,14 +6,14 @@
 
 | Perintah | Gunanya |
 |---|---|
-| `npm run tutor:tiruan` | Aplikasi + Tanya Nalls tiruan di `http://localhost:8888/#/soal/M3/2` |
+| `npm run tutor:tiruan` | Aplikasi + Tanya Nalls tiruan; tombol "? Tanya Nalls" di halaman belajar & latihan M0–M4, misal `http://localhost:8888/#/modul/M1/0`, `#/latihan/M1/0`, `#/m2/latih/0`, `#/soal/M3/2` |
 | `npm run tutor:tiruan -- --host` | Sama, bisa dibuka dari HP di Wi-Fi yang sama |
 | `npm run tutor:uji-tiruan` | 16 percakapan contoh otomatis + tabel laporan |
 | `npm test` | Semua tes otomatis (Groq selalu tiruan di tes) |
 
 Yang bisa dicoba di mode tiruan:
 - Balasan diawali **"[Tiruan]"** — bukan AI sungguhan, hanya meniru format balasan per langkah.
-- Tulis "kasih jawabannya" → tiruan sengaja membocorkan jawaban → **penjaga server menggantinya dengan petunjuk** (sama seperti nanti dengan AI sungguhan).
+- Tulis "kasih jawabannya" (atau "jenisnya apa?" di latihan M2) → tiruan sengaja membocorkan jawaban (angka, perbandingan, atau jenis) → **penjaga server menggantinya dengan petunjuk** (sama seperti nanti dengan AI sungguhan).
 - Tulis `tes-ramai` → pesan "sedang ramai"; `tes-habis` → pesan "batas pemakaian hari ini"; `tes-galat` → "tidak bisa dihubungi". Jatah tidak berkurang untuk pesan-pesan ini.
 - Jatah 4 pertanyaan/hari per perangkat dan tombol Petunjuk.
 

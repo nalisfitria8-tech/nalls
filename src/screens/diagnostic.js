@@ -4,6 +4,7 @@ import { relationTable } from '../components/relationTable.js';
 import { navBar } from '../components/navBar.js';
 import { isCorrectAnswer, scoreDiagnostic, remindersNeeded, startModule, SKILLS } from '../engine/path.js';
 import { logDiagnostic, logEvent } from '../data/logger.js';
+import { setTutorContext } from '../components/tutorContext.js';
 
 /**
  * M0 — Cek kesiapan (F02).
@@ -89,6 +90,10 @@ export function reminderScreen({ m0, skill, index, store, go }) {
     const next = queue[queue.indexOf(skill) + 1];
     return next ? `#/pengingat/${next}/0` : '#/';
   };
+
+  // Tanya Nalls hanya di kartu pengingat & soal ceknya; layar diagnostik TIDAK memasang konteks
+  if (index < card.screens.length) setTutorContext({ module: 'M0', kind: 'pengingat', ref: card.screens[index].id });
+  else setTutorContext({ module: 'M0', kind: 'latihan', ref: card.check.id });
 
   if (index < card.screens.length) {
     const s = card.screens[index];

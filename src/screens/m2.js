@@ -27,6 +27,7 @@ import {
   markReviewed,
 } from '../engine/attempts.js';
 import { logStep, logHint, logEvent, logExplanation } from '../data/logger.js';
+import { setTutorContext } from '../components/tutorContext.js';
 
 const ARAH_TEXT = { searah: 'ikut bertambah', berlawanan: 'berkurang' };
 const JENIS_TEXT = { senilai: '↑↑ Senilai', berbalik: '↑↓ Berbalik nilai' };
@@ -235,6 +236,8 @@ function quickResult({ m2, store, go }) {
 /** Latihan identifikasi I1–I5. */
 export function practiceScreen({ m2, index, go, recallCard }) {
   const items = m2.identify;
+  // Tanya Nalls hanya di latihan identifikasi; cek pemahaman, cek cepat & "jelaskan" tidak memasang konteks
+  setTutorContext({ module: 'M2', kind: 'identifikasi', ref: items[index].id });
   return identifyScreen({
     item: items[index],
     mode: 'latih',

@@ -3,6 +3,7 @@ import { questionView, feedbackBox, hintBox, topBar } from '../components/questi
 import { isCorrectAnswer } from '../engine/path.js';
 import { maxHintLevel, registerWrong } from '../engine/hints.js';
 import { logStep, logHint } from '../data/logger.js';
+import { setTutorContext, updateTutorContext } from '../components/tutorContext.js';
 
 /**
  * Latihan pilihan/isian dengan umpan balik dan petunjuk bertingkat (M1).
@@ -14,6 +15,7 @@ export function quizScreen({ lesson, index, go, onFinish }) {
   const phase = item.phase || 'latihan';
   const max = maxHintLevel(phase, item.hints?.length || 0);
   const s = { hint: 0, wrong: 0, wrongAtMax: 0, solved: false, attempt: 0 };
+  setTutorContext({ module: lesson.module, kind: 'latihan', ref: item.id, hintLevel: 0, errorType: null }); // Tanya Nalls
 
   const main = h('main', { class: 'screen' });
   const next = h('button', { type: 'button', class: 'primary', disabled: true }, index === items.length - 1 ? 'Selesai' : 'Lanjut');
@@ -25,6 +27,7 @@ export function quizScreen({ lesson, index, go, onFinish }) {
     if (s.hint >= max) return;
     s.hint += 1;
     logHint({ item_id: item.id, step: 'jawaban', level: s.hint });
+    updateTutorContext({ hintLevel: s.hint });
     draw();
   }
 
@@ -40,6 +43,7 @@ export function quizScreen({ lesson, index, go, onFinish }) {
     } else {
       const r = registerWrong(phase, s, max);
       Object.assign(s, r);
+      updateTutorContext({ errorType: 'jawaban', hintLevel: s.hint });
       const partial = item.partial?.[value];
       if (r.showSolution) {
         s.solved = true;

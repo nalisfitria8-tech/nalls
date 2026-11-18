@@ -210,8 +210,8 @@ Mengembalikan kelas, hasil diagnostik terakhir, dan `module_progress` untuk memu
 | `ml_start` | siswa mulai tes literasi (F17) | `{ "phase": "awal" }` · `phase`: `awal` \| `akhir` (+ `module_id: "ML"`) |
 | `ml_submit` | siswa mengirim satu bagian tes literasi; bagian itu terkunci (KP-35) | uraian: `{ "phase": "awal", "part": "uraian", "answered": 4, "answers": { "ML1": "…" } }` · PG: `{ "phase": "awal", "part": "pg", "answered": 3, "mcqAnswers": { "PG1": 1 } }` (indeks opsi 0–3) |
 | `ml_score` | penilai menyimpan skor satu soal | `{ "phase": "awal", "scores": [1, 2, 1, 1, 1], "total": 6 }` (+ `item_id`: `ML1`–`ML4`) |
-| `tutor_open` | siswa membuka panel Tanya Nalls (F18) | `{ "step": 1 }` (+ `module_id`, `item_id`) |
-| `tutor_message` | satu pertanyaan ke Tanya Nalls; **tanpa isi pertanyaan/balasan** | `{ "step": 4, "status": "ok", "tokens": 700 }` · `status`: `ok` \| `guarded` \| `limit_device` \| `limit_busy` \| `limit_day` \| `unavailable` \| `disabled` \| `invalid` · `tokens`: jumlah token dari layanan AI (untuk memantau batas), `null` jika tidak ada |
+| `tutor_open` | siswa membuka panel Tanya Nalls (F18) | `{ "kind": "soal", "step": "diketahui" }` · `kind`: `materi` \| `pengingat` \| `latihan` \| `identifikasi` \| `soal` \| `mandiri`; `step` hanya untuk soal (+ `module_id`, `item_id` = ID layar/soal) |
+| `tutor_message` | satu pertanyaan ke Tanya Nalls; **tanpa isi pertanyaan/balasan** | `{ "kind": "soal", "step": "hitung", "status": "ok", "tokens": 700 }` · `status`: `ok` \| `guarded` \| `limit_device` \| `limit_busy` \| `limit_day` \| `unavailable` \| `disabled` \| `invalid` · `tokens`: jumlah token dari layanan AI (untuk memantau batas), `null` jika tidak ada |
 
 **Tes literasi (F17):** jawaban dan skor saat ini **hanya** disimpan di perangkat (`localStorage`, `store.ml`) dan diunduh sebagai CSV dari layar penilai; tidak ada tabel Supabase dan tidak ada pengiriman (KP-29). Kejadian di atas masuk antrean memori seperti kejadian lain. Jika nanti perlu tabel, tambahkan lewat file baru di `supabase/migrations/`.
 

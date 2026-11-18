@@ -3,6 +3,7 @@ import { relationTable } from '../components/relationTable.js';
 import { labelTablesView } from '../components/labelTables.js';
 import { navBar } from '../components/navBar.js';
 import { logEvent } from '../data/logger.js';
+import { setTutorContext } from '../components/tutorContext.js';
 
 /**
  * Menampilkan satu layar materi (satu ide per layar, DS03).
@@ -17,6 +18,7 @@ export function lessonScreen({ lesson, index, go, onFinish = () => go('#/') }) {
   const base = `#/modul/${lesson.module}`;
   const isLast = index === screens.length - 1;
   const labelling = s.interaction?.type === 'label_tables' && s.tables?.length;
+  setTutorContext({ module: lesson.module, kind: 'materi', ref: s.id }); // Tanya Nalls (KP-36)
 
   const tables = labelling
     ? labelTablesView({

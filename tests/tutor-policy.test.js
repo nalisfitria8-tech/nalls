@@ -1,11 +1,19 @@
 import { describe, it, expect } from 'vitest';
 import tutor from '../src/content/tutor.json';
+import m0 from '../src/content/m0.json';
+import m1 from '../src/content/m1.json';
+import m2 from '../src/content/m2.json';
 import m3 from '../src/content/m3.json';
 import m4 from '../src/content/m4.json';
 import {
-  TUTOR_STEPS, STATUS, STATUS_MESSAGE, tutorAllowed, redactPersonal, sanitizeMessage, itemContext, trimHistory,
-  buildMessages, rmtForStep, numbersIn, leaksAnswer, plainText, limitWords, fallbackReply, finalizeReply, dayKey, quotaStatus, consumeQuota,
+  TUTOR_STEPS, TUTOR_KINDS, STATUS, STATUS_MESSAGE, tutorAllowed, kindAllowed, redactPersonal, sanitizeMessage, itemContext, trimHistory,
+  buildMessages, rmtForStep, numbersIn, leaksAnswer, leaksText, leaksPair, PAIRS, guardsFor, plainText, limitWords, fallbackReply, finalizeReply,
+  dayKey, quotaStatus, consumeQuota,
 } from '../src/engine/tutorPolicy.js';
+import { resolveTarget } from '../src/engine/tutorTargets.js';
+
+const CONTENTS = { M0: m0, M1: m1, M2: m2, M3: m3, M4: m4 };
+const resolve = (module, kind, ref, twin = false) => resolveTarget(CONTENTS, tutor.settings, { module, kind, ref, twin });
 
 const item = (id) => [...m3.items, ...m4.items].find((i) => i.id === id);
 const L1 = item('M3-L1'); // 4 kg Rp56.000 → 7 kg = 98.000
@@ -22,6 +30,148 @@ describe('tempat chatbot: hanya fase terbimbing M3–M4', () => {
     expect(tutorAllowed(s, 'M3', { ...L1, phase: 'akhir' })).toBe(false);
     expect(tutorAllowed(s, 'M2', L1)).toBe(false);
     expect(tutorAllowed(s, 'M3', undefined)).toBe(false);
+  });
+});
+
+describe('cakupan M0–M4 per jenis halaman (KP-36)', () => {
+  it('scope: halaman belajar & latihan saja', () => {
+    const s = tutor.settings;
+    expect(kindAllowed(s, 'M0', 'pengingat')).toBe(true);
+    expect(kindAllowed(s, 'M0', 'latihan')).toBe(true);
+    expect(kindAllowed(s, 'M1', 'materi')).toBe(true);
+    expect(kindAllowed(s, 'M2', 'identifikasi')).toBe(true);
+    expect(kindAllowed(s, 'M3', 'soal')).toBe(true);
+    for (const [m, k] of [['M0', 'materi'], ['M0', 'diagnostik'], ['M2', 'cek'], ['M2', 'latihan'], ['M5', 'materi'], ['ML', 'soal']]) {
+      expect(kindAllowed(s, m, k), `${m}/${k}`).toBe(false);
+    }
+  });
+
+  it('server menemukan halaman dari kontennya sendiri', () => {
+    expect(resolve('M0', 'pengingat', 'M0-P3-1').screen.id).toBe('M0-P3-1');
+    expect(resolve('M0', 'latihan', 'M0-P3-C').item.answer).toBe(12);
+    expect(resolve('M1', 'materi', 'M1-01').screen.id).toBe('M1-01');
+    expect(resolve('M1', 'latihan', 'M1-L1').item.answer).toBe('2 : 3');
+    expect(resolve('M2', 'materi', 'M2-06').screen.interaction.type).toBe('label_tables');
+    expect(resolve('M2', 'identifikasi', 'I1').item.jenis).toBe('senilai');
+    expect(resolve('M3', 'soal', 'M3-L1').item.answer).toBe(98000);
+    const twin = resolve('M3', 'soal', 'M3-L1', true).item;
+    expect(twin).toMatchObject({ id: 'M3-L1-K', answer: L1.twin.answer, isTwin: true });
+    expect(twin.hints.length).toBeGreaterThan(0);
+  });
+
+  it('diagnostik, cek M2, mandiri, dan rujukan asing TIDAK pernah ditemukan', () => {
+    const none = [
+      ['M0', 'latihan', 'D1'], // soal diagnostik
+      ['M0', 'pengingat', 'D1'],
+      ['M2', 'identifikasi', 'C1'], // cek pemahaman
+      ['M2', 'identifikasi', 'Q1'], // cek cepat kelas VIII
+      ['M2', 'materi', 'M2-10'],
+      ['M3', 'soal', 'M3-M1'], // mandiri
+      ['M4', 'soal', 'M4-M3'],
+      ['M3', 'soal', 'M3-L1-K'],
+      ['M3', 'latihan', 'M3-L1'],
+      ['M1', 'materi', 123],
+      ['M9', 'materi', 'M1-01'],
+    ];
+    for (const [m, k, r] of none) expect(resolve(m, k, r), `${m}/${k}/${r}`).toBeNull();
+    expect(TUTOR_KINDS).not.toContain('diagnostik');
+  });
+});
+
+describe('konteks untuk AI sesuai halaman', () => {
+  const sys = (target, extra = {}) => buildMessages(tutor, target, { history: [], message: 'x', ...extra })[0].content;
+
+  it('materi: isi layar & fokus materi; tidak ada kunci', () => {
+    const c = sys(resolve('M1', 'materi', 'M1-01'));
+    expect(c).toContain(tutor.kindFocus.materi);
+    expect(c).toContain('Jenis halaman: materi');
+    expect(c).toContain('Perbandingan menunjukkan hubungan dua banyaknya benda.');
+    expect(c).not.toContain('Kunci jawaban');
+  });
+
+  it('M2-06 (label tabel): judul tabel yang memuat jawaban disembunyikan, kunci ditandai rahasia', () => {
+    const c = sys(resolve('M2', 'materi', 'M2-06'));
+    expect(c).not.toContain('SENILAI ↑↑');
+    expect(c).toContain('Kunci jawaban (rahasia, jangan disebut): tabel 1 senilai');
+  });
+
+  it('pengingat, latihan, identifikasi, soal: fokus masing-masing', () => {
+    expect(sys(resolve('M0', 'pengingat', 'M0-P3-2'))).toContain(tutor.kindFocus.pengingat);
+    const lat = sys(resolve('M1', 'latihan', 'M1-L2'), { errorType: 'jawaban' });
+    expect(lat).toContain(tutor.kindFocus.latihan);
+    expect(lat).toContain('Pilihan: 2 : 3 | 3 : 2 | 12 : 30 | 6 : 9');
+    expect(lat).toContain('Kesalahan terakhir siswa: jawaban terakhir belum tepat');
+    const idf = sys(resolve('M2', 'identifikasi', 'I1'));
+    expect(idf).toContain(tutor.kindFocus.identifikasi);
+    expect(idf).toContain('Besaran: bensin dan jarak tempuh');
+    expect(sys(resolve('M3', 'soal', 'M3-L1'), { step: 'jenis' })).toContain(tutor.stepFocus.jenis);
+  });
+});
+
+describe('penjaga: angka, perbandingan, pilihan, jenis', () => {
+  it('perbandingan "2 : 3" dalam berbagai bentuk', () => {
+    for (const t of ['Jawabannya 2 : 3.', 'jadi 2:3', 'yaitu 2 banding 3', '2 berbanding 3']) expect(leaksText(t, '2 : 3'), t).toBe(true);
+    for (const t of ['bagi 10 dan 15 dengan 5', '12 : 3 = 4', '2 : 30']) expect(leaksText(t, '2 : 3'), t).toBe(false);
+  });
+
+  it('pasangan jenis: menyebut satu sisi = bocor; "senilai atau berbalik nilai?" = boleh', () => {
+    expect(leaksPair('Ini senilai.', PAIRS.jenis)).toBe(true);
+    expect(leaksPair('Bukan berbalik nilai.', PAIRS.jenis)).toBe(true);
+    expect(leaksPair('Tabel 1 senilai, tabel 2 berbalik nilai.', PAIRS.jenis)).toBe(true);
+    expect(leaksPair('Menurutmu senilai atau berbalik nilai?', PAIRS.jenis)).toBe(false);
+    expect(leaksPair('Jika bensin bertambah, jarak bagaimana?', PAIRS.jenis)).toBe(false);
+  });
+
+  it('per halaman: latihan M1 (perbandingan & angka), M0 cek, M2 identifikasi & M2-06, soal per langkah', () => {
+    const m1 = resolve('M1', 'latihan', 'M1-L1');
+    expect(leaksAnswer('Jawabannya 2 : 3', m1)).toBe(true);
+    expect(leaksAnswer('Bilangan berapa yang membagi 10 dan 15?', m1)).toBe(false);
+    expect(leaksAnswer('Hasilnya Rp12.000', resolve('M1', 'latihan', 'M1-L3'))).toBe(true);
+    expect(leaksAnswer('hasilnya 12', resolve('M0', 'latihan', 'M0-P3-C'))).toBe(true);
+    const idf = resolve('M2', 'identifikasi', 'I1');
+    expect(leaksAnswer('Ini senilai karena searah.', idf)).toBe(true);
+    expect(leaksAnswer('Jarak ikut bertambah, kan?', idf)).toBe(true); // arah
+    expect(leaksAnswer('Jika bensin bertambah, jarak ikut bertambah atau berkurang?', idf)).toBe(false);
+    const m206 = resolve('M2', 'materi', 'M2-06');
+    expect(leaksAnswer('Tabel buku senilai.', m206)).toBe(true);
+    expect(leaksAnswer('Yang tetap hasil bagi.', m206)).toBe(true);
+    expect(leaksAnswer('Jika buku bertambah, harga bertambah atau berkurang?', m206)).toBe(false);
+    expect(leaksAnswer('Senilai artinya keduanya berubah searah.', resolve('M2', 'materi', 'M2-02'))).toBe(false); // materi biasa: konsep boleh
+    const soal = resolve('M3', 'soal', 'M3-L1');
+    expect(leaksAnswer('Ini senilai.', soal, 'jenis')).toBe(true); // jenis belum ditentukan siswa
+    expect(leaksAnswer('Untuk senilai, yang tetap hasil bagi.', soal, 'hitung')).toBe(false); // sesudah Langkah 3
+    expect(leaksAnswer('Hasilnya 98.000', soal, 'hitung')).toBe(true);
+  });
+
+  it('guardsFor merangkum yang dirahasiakan', () => {
+    expect(guardsFor(resolve('M1', 'latihan', 'M1-L1'))).toEqual({ numbers: [], texts: ['2 : 3'], pairs: [] });
+    expect(guardsFor(resolve('M1', 'latihan', 'M1-L3')).numbers).toEqual([12000]);
+    expect(guardsFor(resolve('M2', 'identifikasi', 'I1')).pairs).toEqual([PAIRS.jenis, PAIRS.arah]);
+    expect(guardsFor(resolve('M1', 'materi', 'M1-01'))).toEqual({ numbers: [], texts: [], pairs: [] });
+  });
+
+  it('balasan bocor di halaman non-soal → petunjuk konten / kalimat umum per jenis', () => {
+    const m1 = resolve('M1', 'latihan', 'M1-L1');
+    expect(finalizeReply('Jawabannya 2 : 3', tutor, m1, {})).toEqual({ text: m1.item.hints[0], status: STATUS.GUARDED });
+    expect(finalizeReply('Tabel 1 senilai, tabel 2 berbalik nilai.', tutor, resolve('M2', 'materi', 'M2-06'), {})).toEqual({ text: tutor.fallbackByKind.materi, status: STATUS.GUARDED });
+    expect(finalizeReply('Ini senilai.', tutor, resolve('M2', 'identifikasi', 'I1'), {}).status).toBe(STATUS.GUARDED);
+  });
+
+  it('petunjuk pengganti di SEMUA halaman M0–M4 yang tercakup tidak pernah membocorkan', () => {
+    const targets = [];
+    for (const card of Object.values(m0.reminders)) {
+      targets.push(...card.screens.map((s) => resolve('M0', 'pengingat', s.id)), resolve('M0', 'latihan', card.check.id));
+    }
+    targets.push(...m1.screens.map((s) => resolve('M1', 'materi', s.id)), ...m1.quiz.map((q) => resolve('M1', 'latihan', q.id)));
+    targets.push(...m2.screens.map((s) => resolve('M2', 'materi', s.id)), ...m2.identify.map((q) => resolve('M2', 'identifikasi', q.id)));
+    for (const m of [m3, m4]) targets.push(...m.screens.map((s) => resolve(m.module, 'materi', s.id)));
+    expect(targets.every(Boolean)).toBe(true);
+    expect(targets.length).toBeGreaterThanOrEqual(30);
+    for (const t of targets) {
+      for (let level = 0; level <= 3; level++) {
+        expect(leaksAnswer(fallbackReply(tutor, t, undefined, level), t), `${t.module} ${t.kind} ${t.screen?.id ?? t.item?.id} ${level}`).toBe(false);
+      }
+    }
   });
 });
 
@@ -152,7 +302,7 @@ describe('penjaga jawaban akhir', () => {
     for (const it of guided) {
       for (const step of TUTOR_STEPS) {
         for (let level = 0; level <= 3; level++) {
-          expect(leaksAnswer(fallbackReply(tutor, it, step, level), it), `${it.id} ${step} ${level}`).toBe(false);
+          expect(leaksAnswer(fallbackReply(tutor, it, step, level), it, step), `${it.id} ${step} ${level}`).toBe(false);
         }
       }
     }
@@ -208,9 +358,12 @@ describe('isi tutor.json', () => {
     }
   });
 
-  it('pengaturan sesuai keputusan: 4/hari, M3–M4 terbimbing, RMT menunggu dosen', () => {
-    expect(tutor.settings).toMatchObject({ dailyPerDevice: 4, modules: ['M3', 'M4'], maxMessageChars: 200, maxReplyWords: 40 });
+  it('pengaturan sesuai keputusan: 4/hari, M0–M4 per jenis halaman, soal terbimbing, RMT menunggu dosen', () => {
+    expect(tutor.settings).toMatchObject({ dailyPerDevice: 4, maxMessageChars: 200, maxReplyWords: 40 });
+    expect(Object.keys(tutor.settings.scope)).toEqual(['M0', 'M1', 'M2', 'M3', 'M4']);
     expect(tutor.settings.phases).not.toContain('mandiri');
+    expect(Object.keys(tutor.kindFocus)).toEqual(['materi', 'pengingat', 'latihan', 'identifikasi']);
+    expect(Object.keys(tutor.fallbackByKind)).toEqual(['materi', 'pengingat', 'latihan', 'identifikasi']);
     expect(tutor.rmt).toMatchObject({ status: 'perlu dilengkapi', tahapan: [], sumber: null });
     expect(Object.keys(tutor.stepFocus)).toEqual(TUTOR_STEPS);
     expect(Object.keys(tutor.fallbackByStep)).toEqual(TUTOR_STEPS);

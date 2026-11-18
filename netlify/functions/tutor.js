@@ -1,7 +1,10 @@
 /**
- * Netlify Function: Tanya Nalls (F18, fitur pendukung).
- * POST /.netlify/functions/tutor  { module, itemId, step, errorType, hintLevel, history, message }
- *   → { status, reply? }   status: lihat STATUS di src/engine/tutorPolicy.js
+ * Netlify Function: Tanya Nalls (F18, fitur pendukung; cakupan M0–M4: KP-36).
+ * POST /.netlify/functions/tutor
+ *   { module, kind, ref, twin?, step?, errorType, hintLevel, history, message }
+ *   (bentuk lama { module, itemId, step } = kind 'soal')
+ *   → { status, reply?, tokens? }   status: lihat STATUS di src/engine/tutorPolicy.js
+ * Isi materi & kunci diambil dari konten server (src/engine/tutorTargets.js), bukan dari browser.
  *
  * Variabel lingkungan (diatur pemilik proyek di dasbor Netlify, BUKAN di kode/Git):
  *   GROQ_API_KEY   kunci Groq (paket Free). Tidak pernah dikirim ke browser atau dicatat.
@@ -12,11 +15,15 @@
  * dihitung di perangkat (lihat docs/architecture.md: keterbatasannya).
  */
 import tutor from '../../src/content/tutor.json';
+import m0 from '../../src/content/m0.json';
+import m1 from '../../src/content/m1.json';
+import m2 from '../../src/content/m2.json';
 import m3 from '../../src/content/m3.json';
 import m4 from '../../src/content/m4.json';
 import {
-  STATUS, TUTOR_STEPS, tutorAllowed, sanitizeMessage, buildMessages, finalizeReply, fallbackReply,
+  STATUS, TUTOR_STEPS, sanitizeMessage, buildMessages, finalizeReply, fallbackReply,
 } from '../../src/engine/tutorPolicy.js';
+import { resolveTarget } from '../../src/engine/tutorTargets.js';
 
 export const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 export const DEFAULT_MODEL = 'openai/gpt-oss-120b';
@@ -25,21 +32,26 @@ export const LIMITS = {
   maxCompletionTokens: 350, // proses berpikir + balasan ±40 kata
   timeoutMs: 8000, // jauh di bawah batas 60 detik fungsi Netlify
 };
-const MODULES = { M3: m3, M4: m4 };
-const ERROR_TYPES = ['ambil_data', 'jenis', 'rumus', 'hitung', 'kewajaran'];
+const CONTENTS = { M0: m0, M1: m1, M2: m2, M3: m3, M4: m4 };
+const ERROR_TYPES = ['ambil_data', 'jenis', 'rumus', 'hitung', 'kewajaran', 'jawaban'];
 
-/** Memeriksa isi permintaan. Mengembalikan { ok, item, step, ... } atau { ok: false }. */
+/** Memeriksa isi permintaan. Mengembalikan { ok, target, step, ... } atau { ok: false }. */
 export function validateRequest(body) {
   if (!body || typeof body !== 'object') return { ok: false };
-  const lesson = MODULES[body.module];
-  const item = lesson?.items.find((i) => i.id === body.itemId);
-  if (!tutorAllowed(tutor.settings, body.module, item)) return { ok: false };
-  if (!TUTOR_STEPS.includes(body.step)) return { ok: false };
+  const kind = body.kind ?? (body.itemId ? 'soal' : undefined);
+  const ref = body.ref ?? body.itemId;
+  const target = resolveTarget(CONTENTS, tutor.settings, { module: body.module, kind, ref, twin: body.twin === true });
+  if (!target) return { ok: false };
+  let step = null;
+  if (kind === 'soal') {
+    if (!TUTOR_STEPS.includes(body.step)) return { ok: false };
+    step = body.step;
+  }
   const msg = sanitizeMessage(body.message, tutor.settings.maxMessageChars);
   if (!msg.ok) return { ok: false };
   const hintLevel = Number.isInteger(body.hintLevel) ? Math.min(Math.max(body.hintLevel, 0), 3) : 0;
   const errorType = ERROR_TYPES.includes(body.errorType) ? body.errorType : null;
-  return { ok: true, item, step: body.step, hintLevel, errorType, history: body.history, message: msg.text };
+  return { ok: true, target, item: target.item, step, hintLevel, errorType, history: body.history, message: msg.text };
 }
 
 /** Groq 429: batas harian (token/permintaan per hari) atau batas per menit. */
@@ -72,7 +84,7 @@ export async function handleTutor(body, { env = {}, fetchImpl = fetch, timeoutMs
       headers: { Authorization: `Bearer ${env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: env.TUTOR_MODEL || DEFAULT_MODEL,
-        messages: buildMessages(tutor, req.item, req),
+        messages: buildMessages(tutor, req.target, req),
         max_completion_tokens: LIMITS.maxCompletionTokens,
         reasoning_effort: 'low',
         include_reasoning: false,
@@ -108,8 +120,8 @@ export async function handleTutor(body, { env = {}, fetchImpl = fetch, timeoutMs
   }
   const raw = data?.choices?.[0]?.message?.content;
   const { text, status } = raw
-    ? finalizeReply(raw, tutor, req.item, req)
-    : { text: fallbackReply(tutor, req.item, req.step, req.hintLevel), status: STATUS.GUARDED };
+    ? finalizeReply(raw, tutor, req.target, req)
+    : { text: fallbackReply(tutor, req.target, req.step, req.hintLevel), status: STATUS.GUARDED };
   const tokens = Number.isInteger(data?.usage?.total_tokens) ? data.usage.total_tokens : null;
   return { httpStatus: 200, body: { status, reply: text, tokens } };
 }

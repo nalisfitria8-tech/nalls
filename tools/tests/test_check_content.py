@@ -342,3 +342,23 @@ def test_tutor_rmt_format_bertahap_divalidasi():
     assert any("ke-1" in e and "'langkah'" in e for e in errors)
     assert any("ke-2" in e and "'nama'" in e for e in errors)
     assert any("ke-3" in e and "tidak dikenal" in e for e in errors)
+
+
+def test_tutor_cakupan_m0_m4_tidak_boleh_diagnostik_cek_tes():
+    bad = _tutor()
+    bad["settings"]["scope"]["M0"].append("diagnostik")
+    bad["settings"]["scope"]["M2"].append("cek")
+    bad["settings"]["scope"]["ML"] = ["soal"]
+    errors = cc.check_tutor(bad)
+    assert any("scope.M0" in e for e in errors)
+    assert any("scope.M2" in e for e in errors)
+    assert any("ML di luar cakupan" in e for e in errors)
+
+
+def test_tutor_fokus_dan_cadangan_per_jenis_halaman_wajib():
+    bad = _tutor()
+    del bad["kindFocus"]["identifikasi"]
+    bad["fallbackByKind"]["materi"] = "kata " * 41
+    errors = cc.check_tutor(bad)
+    assert any("kindFocus" in e for e in errors)
+    assert any("fallbackKind.materi" in e and "40 kata" in e for e in errors)

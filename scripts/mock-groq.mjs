@@ -14,6 +14,11 @@ const STEP_REPLY = {
   ditanya: 'Kalimat mana yang menanyakan sesuatu? Besaran apa yang dicari?',
   jenis: 'Jika besaran pertama bertambah, besaran kedua ikut bertambah atau berkurang?',
   hitung: 'Coba susun hitungannya. Untuk jenis ini, yang tetap hasil bagi atau hasil kali?',
+  // jenis halaman lain (KP-36)
+  materi: 'Coba ceritakan dengan kata-katamu: apa ide utama di layar ini?',
+  pengingat: 'Lihat contoh di kartu ini. Langkah pertama yang dilakukan apa?',
+  latihan: 'Coba kerjakan satu langkah dulu. Bilangan apa yang bisa membagi keduanya?',
+  identifikasi: 'Jika besaran pertama bertambah, besaran kedua ikut bertambah atau berkurang?',
 };
 
 const json = (status, body, headers = {}) =>
@@ -26,10 +31,11 @@ export async function mockGroqFetch(url, init) {
   if (last.includes('tes-ramai')) return json(429, { error: { message: 'Rate limit reached ... tokens per minute (TPM)' } }, { 'retry-after': '20' });
   if (last.includes('tes-habis')) return json(429, { error: { message: 'Rate limit reached ... tokens per day (TPD)' } }, { 'retry-after': '3600' });
   if (last.includes('tes-galat')) return json(500, { error: { message: 'server error' } });
-  const step = (system.match(/Langkah siswa sekarang: \d \((\w+)\)/) ?? [])[1] ?? 'hitung';
-  const answer = (system.match(/Kunci jawaban \(rahasia, jangan disebut\): ([\d.]+)/) ?? [])[1];
-  const content = /jawab|hasil akhir|lengkap/.test(last) && answer
-    ? `[Tiruan] Jawabannya ${answer}.` // sengaja bocor → harus diganti penjaga
+  const kind = (system.match(/Jenis halaman: (\w+)/) ?? [])[1] ?? 'soal';
+  const step = kind === 'soal' ? (system.match(/Langkah siswa sekarang: \d \((\w+)\)/) ?? [])[1] ?? 'hitung' : kind;
+  const answer = (system.match(/Kunci jawaban \(rahasia, jangan disebut\): (.+)/) ?? [])[1]?.trim();
+  const content = /jawab|hasil akhir|lengkap|jenisnya/.test(last) && answer
+    ? `[Tiruan] Jawabannya ${answer}.` // sengaja bocor (angka, perbandingan, atau jenis) → harus diganti penjaga
     : `[Tiruan] ${STEP_REPLY[step] ?? STEP_REPLY.hitung}`;
   return json(200, { choices: [{ message: { content } }], usage: { total_tokens: 900 } });
 }

@@ -30,6 +30,13 @@ import m3 from './content/m3.json';
 import m4 from './content/m4.json';
 import mlTest from './content/ml-test.json';
 import { fill } from './components/dom.js';
+import { createTutorWidget } from './components/tutor.js';
+import { clearTutorContext } from './components/tutorContext.js';
+import tutorContent from './content/tutor.json';
+
+// Tanya Nalls: satu tombol mengambang untuk seluruh aplikasi (KP-36). Layar belajar/latihan
+// M0–M4 memasang konteksnya; halaman lain (diagnostik, tes, penilai, peta) tidak → tombol tersembunyi.
+const tutorWidget = createTutorWidget({ tutor: tutorContent, store });
 
 // Modul yang kontennya sudah ada. Modul lain ditambahkan bertahap (docs/task.md bagian C).
 const lessons = { M1: m1, M2: m2, M3: m3, M4: m4 };
@@ -181,7 +188,9 @@ function route() {
 }
 
 function render() {
+  clearTutorContext(); // setiap pindah halaman; layar yang tercakup memasangnya lagi
   fill(app, ...route());
+  tutorWidget.refresh();
   window.scrollTo(0, 0);
 }
 

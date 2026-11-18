@@ -668,17 +668,83 @@ fieldset.ml-stage legend {
   font-size: var(--fs-body);
 }
 
-/* ---------- Tanya Nalls (F18, fase terbimbing M3–M4) ---------- */
-.tutor {
+/* ---------- Tanya Nalls (F18): tombol mengambang + panel, M0–M4 (KP-36) ---------- */
+.tutor-fab {
+  position: fixed;
+  z-index: 20;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  min-height: 56px;
+  padding: 0 20px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  border-radius: 999px;
+  border: 2px solid var(--violet);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 700;
+}
+.tutor-fab-icon {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--on-primary);
+  color: var(--primary);
+  font-weight: 800;
+}
+/* di HP, tombol berada di atas bilah navigasi bawah (Kembali/Ulangi/Lanjut) */
+body.tutor-navbar .tutor-fab {
+  bottom: calc(84px + env(safe-area-inset-bottom));
+}
+/* ruang di bawah isi halaman agar tidak tertutup tombol */
+body.tutor-on main.screen {
+  padding-bottom: 88px;
+}
+.tutor-panel {
+  position: fixed;
+  z-index: 30;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 75vh;
+  overflow-y: auto;
   display: grid;
   gap: var(--space-1);
-}
-.tutor:has(.tutor-head) {
+  align-content: start;
+  padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
   background: var(--card);
-  border: 1px solid var(--accent);
-  border-left: 4px solid var(--violet);
-  border-radius: var(--radius);
-  padding: var(--space-1) var(--space-2) var(--space-2);
+  color: var(--text);
+  border-top: 3px solid var(--violet);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.tutor-fab[hidden],
+.tutor-panel[hidden] {
+  display: none;
+}
+/* laptop/tablet: kartu di pojok kanan bawah; kolom aplikasi di tengah tidak tertutup tombol */
+@media (min-width: 600px) {
+  .tutor-panel {
+    left: auto;
+    right: 16px;
+    bottom: 16px;
+    /* muat di ruang kosong samping kolom aplikasi bila cukup, agar soal & tombol tidak tertutup */
+    width: min(380px, max(300px, calc((100vw - var(--max-width)) / 2 - 24px)));
+    max-height: 70vh;
+    border: 1px solid var(--accent);
+    border-top: 3px solid var(--violet);
+    border-radius: var(--radius);
+  }
+}
+@media (min-width: 900px) {
+  body.tutor-navbar .tutor-fab {
+    bottom: 24px;
+  }
+  body.tutor-on main.screen {
+    padding-bottom: var(--space-2);
+  }
 }
 .tutor-head {
   display: flex;

@@ -192,3 +192,33 @@ describe('siswa baru: setelah memilih kelas ke peta belajar (Tes awal sebelum M0
     expect(m0.disabled).toBe(false);
   });
 });
+
+describe('Tanya Nalls: tombol mengambang menurut halaman (KP-36)', () => {
+  it('tampil di halaman belajar & latihan M0–M4; tersembunyi di diagnostik, tes, penilai, peta belajar', async () => {
+    store.reset();
+    store.update((s) => {
+      s.grade = 7;
+      s.diagnostic.done = true;
+      s.diagnostic.reminders = ['pecahan'];
+    });
+    const fab = () => document.querySelector('.tutor-fab');
+    const shown = async (hash) => {
+      await visit(hash);
+      return !fab().hidden;
+    };
+    expect(document.querySelectorAll('.tutor-fab')).toHaveLength(1); // satu tombol untuk seluruh aplikasi
+    for (const hash of ['#/pengingat/pecahan/0', '#/modul/M1/0', '#/latihan/M1/0', '#/modul/M2/5', '#/m2/latih/0', '#/modul/M3/0', '#/soal/M3/2', '#/soal/M4/0']) {
+      expect(await shown(hash), hash).toBe(true);
+    }
+    for (const hash of ['#/', '#/diagnostik/intro', '#/diagnostik/0', '#/tes-ml/awal', '#/tes-ml/penilai', '#/m2/cek/mulai', '#/m2/tawar', '#/selesai/M1']) {
+      expect(await shown(hash), hash).toBe(false);
+    }
+    // buka panel di soal, lalu pindah ke tes awal → panel & tombol hilang
+    await visit('#/soal/M3/2');
+    fab().click();
+    expect(document.querySelector('.tutor-panel').hidden).toBe(false);
+    await visit('#/tes-ml/awal');
+    expect(document.querySelector('.tutor-panel').hidden).toBe(true);
+    expect(fab().hidden).toBe(true);
+  });
+});
