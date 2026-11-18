@@ -1,18 +1,25 @@
 /* Token visual — sumber: docs/design.md §3. Jangan menambah warna di luar daftar ini.
-   Tema: pink lembut + hijau tua (revisi tampilan, 12 Nov 2026). */
+   Tema: Dark Technology — navy gelap, aksen biru elektrik + ungu (Tahap 2, 18 Nov 2026).
+   Semua pasangan teks/latar ≥ 4,5:1 (rincian kontras di design.md §3). */
 :root {
-  --bg: #fce7ef; /* latar halaman (pink muda) */
-  --card: #ffffff; /* kartu, tombol, kotak isian */
-  --surface: #ffffff; /* kotak soal, tabel, petunjuk (kartu putih di atas latar pink) */
-  --accent: #f4bfd0; /* dekoratif: garis kartu, pemisah, sorotan lembut — bukan untuk teks */
-  --text: #174d3a; /* teks utama (hijau tua) */
-  --muted: #4f6b60; /* teks bantu, garis kotak isian */
-  --primary: #174d3a; /* tombol utama, header, langkah aktif */
-  --on-primary: #ffffff; /* teks di atas hijau tua */
-  --senilai: #0f766e;
-  --berbalik: #c2410c;
-  --ok: #15803d;
-  --err: #b91c1c;
+  color-scheme: dark; /* kontrol bawaan browser (radio, pilihan, gulir) ikut gelap */
+
+  --bg: #0b1226; /* latar halaman (navy gelap) */
+  --card: #131c3a; /* kartu, tombol, kotak isian */
+  --surface: #131c3a; /* kotak soal, tabel, petunjuk */
+  --surface-2: #1c2852; /* kepala tabel, pilihan terpilih, label status */
+  --accent: #2e3d6b; /* garis kartu & pemisah (dekoratif, bukan untuk teks) */
+  --text: #e6eaf5; /* teks utama */
+  --muted: #a9b4d0; /* teks bantu, garis kotak isian */
+  --primary: #5b95ff; /* biru elektrik: tombol utama, tautan, langkah aktif */
+  --on-primary: #0b1226; /* teks di atas biru elektrik */
+  --violet: #a78bfa; /* ungu: garis aksen header & judul bagian */
+  --violet-text: #c4b5fd; /* teks ungu (label kelas/kemajuan) */
+  --senilai: #5eead4; /* latar label Senilai ↑↑ (teks gelap di atasnya) */
+  --berbalik: #fdba74; /* latar label Berbalik nilai ↑↓ (teks gelap di atasnya) */
+  --on-tag: #0b1226; /* teks di atas label jenis & penanda F07 */
+  --ok: #4ade80;
+  --err: #f87171;
   --mark-num: #fef08a;
   --mark-ask: #bfdbfe;
 

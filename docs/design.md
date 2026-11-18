@@ -29,26 +29,32 @@ Dokumen ini menjelaskan tampilan, alur layar, struktur materi, dan contoh isi. S
 
 | Token | Nilai | Pemakaian |
 |---|---|---|
-| `--bg` | `#FCE7EF` (pink muda) | Latar halaman, bilah navigasi bawah, kepala tabel |
-| `--card` | `#FFFFFF` | Kartu, tombol, kotak isian |
-| `--surface` | `#FFFFFF` | Kotak soal, tabel, petunjuk (kartu putih di atas latar pink) |
-| `--accent` | `#F4BFD0` (pink dekoratif) | Garis kartu, pemisah, penanda judul bagian. **Bukan untuk teks** (kontras rendah) |
-| `--text` | `#174D3A` (hijau tua) | Teks utama |
-| `--muted` | `#4F6B60` | Teks bantu, garis kotak isian |
-| `--primary` | `#174D3A` (hijau tua) | Bilah atas (header), tombol utama, langkah aktif |
-| `--on-primary` | `#FFFFFF` | Teks di atas hijau tua |
-| `--senilai` | `#0F766E` (hijau toska) | Label/ikon **Senilai** ↑↑ |
-| `--berbalik` | `#C2410C` (oranye tua) | Label/ikon **Berbalik nilai** ↑↓ |
-| `--ok` | `#15803D` | Umpan balik benar |
-| `--err` | `#B91C1C` | Umpan balik belum tepat |
+| `--bg` | `#0B1226` (navy gelap) | Latar halaman, bilah navigasi bawah |
+| `--card` | `#131C3A` (navy) | Bilah atas, kartu, tombol, kotak isian |
+| `--surface` | `#131C3A` (navy) | Kotak soal, tabel, petunjuk |
+| `--surface-2` | `#1C2852` (navy terang) | Kepala tabel, pilihan terpilih, label status |
+| `--accent` | `#2E3D6B` | Garis kartu dan pemisah. **Bukan untuk teks** (dekoratif) |
+| `--text` | `#E6EAF5` | Teks utama |
+| `--muted` | `#A9B4D0` | Teks bantu, garis kotak isian |
+| `--primary` | `#5B95FF` (biru elektrik) | Tombol utama, tautan, garis pilihan, langkah aktif |
+| `--on-primary` | `#0B1226` | Teks di atas biru elektrik |
+| `--violet` | `#A78BFA` (ungu) | Garis aksen bilah atas (gradien biru→ungu, statis) dan judul bagian |
+| `--violet-text` | `#C4B5FD` | Teks ungu (label kelas/kemajuan di bilah atas) |
+| `--senilai` | `#5EEAD4` (toska terang) | Latar label **Senilai** ↑↑ |
+| `--berbalik` | `#FDBA74` (oranye terang) | Latar label **Berbalik nilai** ↑↓ |
+| `--on-tag` | `#0B1226` | Teks di atas label jenis dan penanda F07 |
+| `--ok` | `#4ADE80` | Umpan balik benar, status selesai |
+| `--err` | `#F87171` | Umpan balik belum tepat |
 | `--mark-num` | `#FEF08A` (kuning muda) | Penanda angka (F07) |
 | `--mark-ask` | `#BFDBFE` (biru muda) | Penanda pertanyaan (F07) |
 
-- Tema pink lembut + hijau tua (revisi tampilan atas permintaan pemilik proyek, 12 Nov 2026). Kontras teks: hijau tua di pink 8,25:1, di putih 9,73:1, putih di hijau tua 9,73:1, `--muted` di pink 4,94:1 (semua ≥ 4,5:1). Warna jenis (senilai/berbalik), umpan balik, dan penanda F07 tidak berubah.
+- **Tema Dark Technology** (Tahap 2 rencana Nalls, 18 Nov 2026; menggantikan tema pink 12 Nov). Tanpa animasi, kilau, atau bayangan bercahaya; gradien hanya pada garis bawah bilah atas dan tidak bergerak.
+- Kontras teks (semua ≥ 4,5:1): `--text` di `--bg` 15,46:1, di `--card` 13,91:1, di `--surface-2` 11,83:1 · `--muted` di `--card` 8,07:1, di `--surface-2` 6,87:1 · `--primary` sebagai teks di `--card` 5,73:1, di `--surface-2` 4,87:1 · `--on-primary` di `--primary` 6,37:1 · `--violet-text` di `--card` 9,06:1 · `--ok` di `--card` 9,6:1 · `--err` di `--card` 6,05:1 · `--on-tag` di `--senilai` 12,58:1, di `--berbalik` 11,03:1, di `--mark-num` 15,99:1, di `--mark-ask` 13,09:1.
+- Warna label jenis dan umpan balik dibuat lebih terang agar terbaca di latar gelap; maknanya tetap (toska = senilai, oranye = berbalik nilai).
 - Warna **tidak pernah** menjadi satu-satunya pembeda: Senilai/Berbalik selalu disertai label teks dan ikon panah; status selalu disertai kata ("Tepat", "Belum tepat").
 - Huruf: font sistem (tanpa unduh font). Isi 16–18 px, judul 20–22 px, angka tabel 18 px.
 - Ruang: kelipatan 8 px. Tombol minimal tinggi 48 px, jarak antartombol ≥ 8 px.
-- Mode gelap: tidak di MVP (mengurangi variasi tampilan yang perlu diuji).
+- Satu tema saja (gelap); tidak ada pilihan mode terang/gelap, agar variasi tampilan yang perlu diuji tetap sedikit.
 
 ## 4. Komponen
 
