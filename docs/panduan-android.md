@@ -40,3 +40,10 @@ Jika halaman tidak terbuka: periksa Wi-Fi sama, alamat benar (termasuk `:4173`),
 - Jika satu HP dipakai bergantian: unduh CSV dulu, baru ketuk **Mulai ulang (versi pengembangan)** untuk siswa berikutnya.
 - Layar penilai tidak berkata sandi. Guru membukanya sendiri, jangan oleh siswa.
 - Kode perangkat (misal `P-7KQ3MX`) di CSV dipakai untuk mencocokkan tes awal dan tes akhir siswa yang sama.
+
+## E. Tanya Nalls (chatbot)
+
+- Tanya Nalls hanya ada di soal terbimbing M3–M4 dan butuh **internet**.
+- Dengan cara A di atas (`npm run preview` di laptop), chatbot **tidak aktif**: panel menampilkan "Tanya Nalls tidak bisa dihubungi". Ini normal; tombol **Petunjuk** tetap bisa dipakai.
+- Chatbot hanya berjalan di situs Netlify yang sudah diatur kuncinya (`GROQ_API_KEY`, `TUTOR_ENABLED=true`). Tiap HP mendapat 4 pertanyaan per hari.
+- Ingatkan siswa: **jangan menulis nama atau data pribadi** di kotak pertanyaan.

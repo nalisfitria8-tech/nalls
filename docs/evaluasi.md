@@ -119,6 +119,7 @@ Target angka masih **sementara** (`keputusan.md` KP-15).
 | F14 3D | Ketepatan identifikasi jenis: 3D vs 2D | `events` (`viz_*`), `step_responses` | Ada manfaat, atau fitur dihapus |
 | F15 Data | Kejadian tercatat setelah sinkron | Sesi uji teknis | ≥ 99% |
 | F16 Tampilan | Waktu muat; Lighthouse aksesibilitas | Uji teknis | < 3 dtk; ≥ 90 |
+| F18 Tanya Nalls | Pertanyaan per siswa; proporsi `guarded` (balasan diganti penjaga) dan batas (`limit_*`); ketepatan langkah yang sama setelah bertanya; tidak ada jawaban akhir yang lolos (diperiksa manual pada uji 3e) | `events` (`tutor_open`, `tutor_message`), `step_responses` | Dideskripsikan; 0 jawaban akhir lolos |
 | F17 Tes literasi | Skor tes akhir − tes awal; N-gain; perubahan per indikator | CSV dari layar penilai (§9) | N-gain sedang/tinggi (sementara, KP-15) |
 
 ## 7. Rubrik "Jelaskan ke temanmu" (F11)

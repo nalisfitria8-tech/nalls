@@ -17,6 +17,7 @@ Aplikasi web pembelajaran **Perbandingan Senilai dan Berbalik Nilai** untuk sisw
 - Tabel untuk melihat hubungan besaran; teks sedikit; satu soal per layar.
 - Petunjuk bertingkat (bukan langsung jawaban) dan pembahasan sesuai jenis kesalahan.
 - Siswa mengatur tempo: Kembali, Ulangi, Lanjut.
+- **Tanya Nalls** (chatbot pendamping, soal terbimbing M3–M4): membimbing satu langkah, tanpa jawaban akhir, jatah 4/hari; kunci AI hanya di server Netlify (`docs/architecture.md` §12).
 - Tes Mathematical Literacy (tes awal & tes akhir, 4 soal, rubrik per tahap) dengan layar penilai dan unduhan CSV untuk menguji efektivitas aplikasi (`docs/evaluasi.md` §9).
 
 ## Dokumentasi

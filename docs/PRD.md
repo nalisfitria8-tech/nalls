@@ -200,6 +200,8 @@ Interpretasi bersifat sementara (1 informan).
 | N19 | DS02 | F03 (cek pemahaman), F12 |
 | N20 | DS03 | F13 |
 
+F15, F17, dan F18 adalah fitur pendukung tanpa kebutuhan N dari wawancara (alasan di §8).
+
 ---
 
 ## 8. Spesifikasi fitur
@@ -358,6 +360,15 @@ Setiap fitur memuat: kode bukti, rasional CLT, perilaku yang diharapkan, dan ind
 - **Perilaku diharapkan:** siswa mengerjakan tes awal sebelum M0 dan tes akhir setelah menyelesaikan modul; guru menilai keempat soal tiap fase.
 - **Indikator uji:** skor tes akhir > tes awal; N-gain per siswa dan rata-rata kelompok; perubahan skor per indikator (`evaluasi.md` §9).
 - **Data:** di perangkat (`store.ml`) + CSV; kejadian `ml_start`, `ml_submit`, `ml_score` (`api.md` §5). Belum ada tabel Supabase (KP-29).
+
+### F18 — Tanya Nalls (chatbot pendamping belajar) · S · *fitur pendukung, bukan dari wawancara*
+- **Alasan:** permintaan pemilik proyek (rencana Nalls, 18 Nov 2026). Tidak ada kode bukti wawancara; fitur ini **tambahan** untuk Petunjuk bertingkat (F08), bukan pengganti.
+- **Deskripsi:** di layar soal 4 langkah **fase terbimbing** M3–M4 (contoh, setengah, latihan) ada tombol **Tanya Nalls**. Siswa menulis pertanyaan (≤ 200 huruf); Nalls membalas satu langkah, ±40 kata, diakhiri satu pertanyaan balik, **tanpa jawaban akhir**. Tidak muncul di latihan mandiri, soal kembar, tes awal/akhir, diagnostik, atau cek M2. Jatah 4 pertanyaan per perangkat per hari (KP-33). Jika layanan AI mencapai batas atau tidak bisa dihubungi, muncul pesan yang jelas dan tombol **Petunjuk** tetap dipakai. Teknis: `architecture.md` §12; keputusan KP-32–KP-34.
+- **Rasional CLT:** bantuan mengikuti langkah yang sedang dikerjakan (tidak melompat), satu langkah per balasan agar informasi baru sedikit, istilah tetap sama dengan materi, panel hanya terbuka jika diketuk. Balasan yang memuat jawaban akhir diganti petunjuk konten (penjaga di server), sehingga siswa tetap mengerjakan sendiri.
+- **RMT (Rigorous Mathematical Thinking):** **perlu dilengkapi** — tahapan menunggu rangkuman resmi dosen (PT-09). Wadah `rmt.tahapan` di `src/content/tutor.json` sengaja kosong; tidak diisi sebelum ada sumbernya.
+- **Perilaku diharapkan:** siswa bertanya saat macet di satu langkah, lalu kembali mengisi langkah itu sendiri.
+- **Indikator uji:** pemakaian per siswa (jumlah & status), proporsi balasan yang diganti penjaga (`guarded`), proporsi batas tercapai; ketepatan langkah berikutnya setelah bertanya (`step_responses`). Lihat `evaluasi.md` §6.
+- **Data:** hanya jumlah & status (`tutor_open`, `tutor_message`, `api.md` §5). **Isi percakapan tidak disimpan** di perangkat, server, maupun log.
 
 ---
 

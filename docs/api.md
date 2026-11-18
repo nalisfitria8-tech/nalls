@@ -210,6 +210,8 @@ Mengembalikan kelas, hasil diagnostik terakhir, dan `module_progress` untuk memu
 | `ml_start` | siswa mulai tes literasi (F17) | `{ "phase": "awal" }` · `phase`: `awal` \| `akhir` (+ `module_id: "ML"`) |
 | `ml_submit` | siswa mengirim tes literasi; jawaban terkunci | `{ "phase": "awal", "answered": 4, "answers": { "ML1": "…" } }` |
 | `ml_score` | penilai menyimpan skor satu soal | `{ "phase": "awal", "scores": [1, 2, 1, 1, 1], "total": 6 }` (+ `item_id`: `ML1`–`ML4`) |
+| `tutor_open` | siswa membuka panel Tanya Nalls (F18) | `{ "step": 1 }` (+ `module_id`, `item_id`) |
+| `tutor_message` | satu pertanyaan ke Tanya Nalls; **tanpa isi pertanyaan/balasan** | `{ "step": 4, "status": "ok", "tokens": 700 }` · `status`: `ok` \| `guarded` \| `limit_device` \| `limit_busy` \| `limit_day` \| `unavailable` \| `disabled` \| `invalid` · `tokens`: jumlah token dari layanan AI (untuk memantau batas), `null` jika tidak ada |
 
 **Tes literasi (F17):** jawaban dan skor saat ini **hanya** disimpan di perangkat (`localStorage`, `store.ml`) dan diunduh sebagai CSV dari layar penilai; tidak ada tabel Supabase dan tidak ada pengiriman (KP-29). Kejadian di atas masuk antrean memori seperti kejadian lain. Jika nanti perlu tabel, tambahkan lewat file baru di `supabase/migrations/`.
 
@@ -335,5 +337,10 @@ Catatan: siswa kelas VIII yang lulus cek cepat lalu tetap mempelajari M2 bisa pu
 | `VITE_SUPABASE_URL` | URL proyek | `.env.local` dan pengaturan Netlify |
 | `VITE_SUPABASE_ANON_KEY` | kunci anon (publik) | `.env.local` dan pengaturan Netlify |
 
+| `GROQ_API_KEY` | kunci Groq (paket Free) untuk Tanya Nalls | **hanya** dasbor Netlify (Environment variables, "Contains secret values"); lokal: `.env` |
+| `TUTOR_ENABLED` | `true` untuk menyalakan Tanya Nalls; selain itu mati | dasbor Netlify |
+| `TUTOR_MODEL` | bawaan `openai/gpt-oss-120b` | dasbor Netlify (opsional) |
+
 `.env.local` tidak di-commit. Kunci `service_role` tidak pernah dipakai di aplikasi.
+Variabel Tanya Nalls **tanpa awalan `VITE_`**: variabel `VITE_*` ikut masuk berkas JavaScript yang diunduh browser. Fungsi server tidak mengirim kunci ke browser dan tidak mencatat kunci maupun isi pesan.
 Di dashboard Supabase: aktifkan **Anonymous sign-ins** (Authentication → Providers).

@@ -70,6 +70,7 @@ Dokumen ini menjelaskan tampilan, alur layar, struktur materi, dan contoh isi. S
 | **Kartu cek kewajaran** | Dua pilihan arah + syarat. | F10 |
 | **Kartu "Ingat lagi"** | Ringkasan cara menentukan jenis (lembar bawah/bottom sheet). | F04, EL04 |
 | **Kotak penjelasan** | Kalimat rumpang + teks bebas ≤ 3 kalimat. | F11 |
+| **Tanya Nalls** | Tombol "Tanya Nalls · Sisa tanya hari ini: n" di atas Petunjuk (soal terbimbing M3–M4). Terbuka: pengingat privasi, satu pertanyaan + satu balasan (label "Balasan dari AI"), kotak isian ≤ 200 huruf + Kirim. Pesan batas mengarahkan ke Petunjuk. Tanpa animasi; garis kiri ungu. | F18 |
 | **Panel 3D** | Kanvas 3D + penggeser; tombol "Sembunyikan gambar". | F14 |
 
 ## 5. Alur layar

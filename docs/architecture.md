@@ -59,7 +59,8 @@ Target ukuran: unduhan awal (tanpa Three.js) ≤ 150 KB gzip. Build saat ini ±1
 mathsave/
 ├─ README.md, AGENTS.md
 ├─ index.html            halaman tunggal; memuat src/main.js
-├─ netlify.toml          perintah build Netlify
+├─ netlify.toml          perintah build Netlify + folder fungsi (esbuild)
+├─ netlify/functions/tutor.js  fungsi server Tanya Nalls: memanggil Groq, penjaga jawaban (F18, §12)
 ├─ docs/                 dokumentasi (PRD, design, architecture, api, task, naskah, kisi-kisi, keputusan, evaluasi)
 ├─ referensi/            file wawancara (tidak di-deploy, dikecualikan dari git)
 ├─ src/
@@ -81,6 +82,7 @@ mathsave/
 │  │  ├─ markedText.js   teks soal yang angka dan kalimatnya bisa ditandai (F07, KP-26)
 │  │  ├─ question.js     soal pilihan/isian, kotak umpan balik, kotak petunjuk, bilah atas
 │  │  ├─ explain.js      "Jelaskan ke temanmu": kalimat rumpang + teks bebas + daftar cek (F11)
+│  │  ├─ tutor.js        panel Tanya Nalls + jatah per perangkat + pengirim ke fungsi server (F18)
 │  │  └─ navBar.js       Kembali · Ulangi · Lanjut (F06)
 │  ├─ engine/            logika murni tanpa DOM (diuji Vitest)
 │  │  ├─ number.js       membaca/menulis angka format Indonesia (12.000; 26,67)
@@ -92,12 +94,13 @@ mathsave/
 │  │  ├─ attempts.js     percobaan cek M2: kunci jawaban pertama, tutup & catat sekali (KP-25)
 │  │  ├─ mlScore.js      tes literasi: skor per tahap rubrik, ringkasan fase, N-gain, CSV (F17)
 │  │  ├─ marking.js      F07: memecah teks soal jadi kalimat & angka, menaruh angka di tabel Diketahui
+│  │  ├─ tutorPolicy.js  Tanya Nalls: tempat, pesan ringkas, penjaga jawaban akhir, batas kata, jatah (F18)
 │  │  └─ path.js         skor diagnostik, titik mulai, status modul, gerbang mandiri (F02, DS02)
 │  ├─ data/
 │  │  ├─ store.js        keadaan belajar di localStorage (sementara sampai C5/C15)
 │  │  └─ logger.js       antrean kejadian di memori, bentuk sama dengan tabel api.md (F15, sebagian)
 │  ├─ content/           m0.json, m1.json, m2.json, m3.json, m4.json (M5, M6 dan Pengayaan: rencana C13);
-│  │                     ml-test.json (tes literasi, F17)
+│  │                     ml-test.json (tes literasi, F17); tutor.json (aturan & pesan Tanya Nalls, wadah RMT, F18)
 │  └─ styles/            tokens.css (warna, ukuran), base.css (tata letak, komponen)
 ├─ tests/                Vitest: engine, alur layar, router, gaya (*.test.js)
 ├─ tools/
@@ -148,6 +151,7 @@ Disimpan di `localStorage` dengan kunci `mathsave:v1` (nama lama aplikasi; **sen
 | `m2.quickDone`, `m2.quickScore`, `m2.quick.answers` | cek cepat (sekali; KP-25, usulan) |
 | `m2.cek` | percobaan cek pemahaman: `attempt`, `open`, `order`, `answers` (jawaban pertama, dikunci), `result`, `reviewed` (KP-25) |
 | `ml.deviceId`, `ml.participant` | kode acak perangkat (`P-XXXXXX`) dan kode peserta dari penilai (bukan nama) |
+| `tutor` | `{ date, count }`: jumlah pertanyaan Tanya Nalls hari ini (pembatasan sederhana, §12); **tanpa** isi percakapan |
 | `ml.awal`, `ml.akhir` | tes literasi: `answers` (draf/terkirim), `startedAt`, `submittedAt`, `progressAtSubmit`, `scores` (per tahap), `scoredAt` (F17) |
 
 Skor cek pemahaman (`m2.cek.result.correct`) nanti dikirim ke `module_progress.check_score` (wajib sebelum/bersama C15).
@@ -261,6 +265,7 @@ Sampai langkah ini selesai, kelas dipilih di layar awal (versi pengembangan). De
 - Kunci `anon` Supabase boleh ada di aplikasi; kunci `service_role` **tidak boleh** ada di repo atau aplikasi.
 - Folder `referensi/` tidak ikut di-deploy dan dikecualikan dari git lewat `.gitignore` (transkrip memuat data pribadi).
 - Persetujuan orang tua/wali dan siswa dikumpulkan di luar aplikasi sebelum uji coba.
+- Kunci layanan AI (`GROQ_API_KEY`) hanya di variabel lingkungan server Netlify, tidak di repo atau browser; isi percakapan Tanya Nalls tidak disimpan (§12).
 
 ## 11. Keputusan yang masih terbuka
 
@@ -269,3 +274,23 @@ Sampai langkah ini selesai, kelas dipilih di layar awal (versi pengembangan). De
 | UI tanpa framework vs Preact | Tanpa framework (JavaScript murni) | Diputuskan saat C1 |
 | Region Supabase | Singapura (terdekat) | Saat membuat proyek Supabase |
 | Repo publik atau privat | Disarankan privat selama penelitian | Sebelum commit pertama (repo git belum dibuat) |
+
+## 12. Chatbot Tanya Nalls (F18) — Netlify Function + Groq Free
+
+```
+HP siswa (layar soal M3/M4 terbimbing)        Netlify Function                         Groq Free
+src/components/tutor.js ──POST JSON──────────► netlify/functions/tutor.js ──HTTPS──────► openai/gpt-oss-120b
+ { module, itemId, step, errorType,            · TUTOR_ENABLED ≠ "true" → disabled
+   hintLevel, history (≤2), message ≤200 }      · validasi soal & langkah (tutorPolicy.js)
+◄── { status, reply?, tokens } ──────────────── · susun pesan ringkas (tutor.json)
+                                                · penjaga jawaban akhir, ≤ 40 kata
+```
+
+- **Aturan murni** di `src/engine/tutorPolicy.js` (dipakai browser dan server, diuji Vitest); teks aturan bimbingan, pesan batas, dan wadah RMT di `src/content/tutor.json` (diperiksa `check_content.py`).
+- **Permintaan hemat token:** aturan ±450 token + data soal ±250 + riwayat 2 tanya-jawab ±150 + pesan ≤ 200 huruf; `max_completion_tokens` 350, `reasoning_effort: "low"`, `include_reasoning: false`; batas waktu 8 detik (batas fungsi Netlify 60 detik).
+- **Status:** `ok`, `guarded` (balasan diganti petunjuk), `limit_device` (jatah perangkat), `limit_busy` (Groq 429 per menit / 413), `limit_day` (Groq 429 harian: pesan menyebut "per day/TPD/RPD", `x-ratelimit-remaining-requests: 0`, atau `retry-after` > 120 dtk), `unavailable` (offline, server tidak ada, galat Groq, kunci ditolak, terlalu lama), `disabled`, `invalid`. Semua status selain `ok`/`guarded` menampilkan pesan yang mengarahkan ke tombol **Petunjuk**.
+- **Batas Groq Free:** dokumen resmi Groq menampilkan 30 RPM, 1K RPD, 8K TPM, 200K TPD untuk `openai/gpt-oss-120b`, tetapi tabel itu disebut *base limits for the Developer plan*. Batas berlaku per **organisasi** (bukan per kunci), dan batas akun yang sebenarnya hanya terlihat di console (`/settings/limits`). Jangan dianggap jaminan kuota Free. Token yang ter-*cache* tidak dihitung; apakah token berpikir dihitung tidak disebutkan dokumen. Perkiraan dengan angka tabel: ±1.000–1.250 token/permintaan → 160–200 permintaan/hari dan 6–8 per menit untuk seluruh kelas.
+- **Netlify Free:** 300 kredit/bulan dengan **batas keras**, tanpa isi ulang, tidak pernah ditagih. Jika kredit habis, **semua situs di tim dihentikan sementara** ("Site not available") sampai siklus berikutnya — termasuk materi dan tes, bukan hanya chatbot. Pemakaian fungsi dihitung sebagai *compute* 10 kredit per GB-jam (memori bawaan 1 GB): ±3 detik per permintaan ≈ 0,008 kredit → ±3.000 permintaan/bulan ≈ 25 kredit. Setiap **deploy produksi 15 kredit** (yang paling boros): batasi deploy selama uji coba dan pantau pemakaian kredit di dasbor. Permintaan web 2 kredit per 10.000.
+- **Jatah per perangkat (`store.tutor = { date, count }`)** hanya pembatasan sederhana: bisa dilewati dengan menghapus data browser, mode penyamaran, atau perangkat lain, dan alamat fungsi bisa dipanggil langsung. Karena paket gratis tanpa kartu, akibat terburuknya kuota habis (layanan berhenti sementara), **bukan tagihan**. Penghitung di server (Netlify Blobs) bisa ditambahkan nanti bila perlu.
+- **Privasi:** yang dikirim ke Groq hanya data soal, isian/kesalahan langkah, riwayat singkat dari memori panel, dan pesan siswa (email & nomor HP disamarkan). Tidak ada nama, kode peserta, atau kode perangkat. Isi percakapan tidak disimpan di perangkat, server, maupun log. Aktifkan *Zero Data Retention* di console Groq (Data Controls).
+- **Uji lokal:** `npm run preview` tidak menjalankan fungsi → panel menampilkan "tidak bisa dihubungi" (Petunjuk tetap jalan). Fungsi berjalan di situs Netlify atau `netlify dev`. Uji dengan Groq sungguhan = Tahap 3e (menunggu persetujuan pengembang).
