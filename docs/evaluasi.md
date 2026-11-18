@@ -1,4 +1,4 @@
-# Rencana Evaluasi — MathSave
+# Rencana Evaluasi — Nalls
 
 Rencana validasi dan uji coba untuk tahap **Implement** dan **Evaluate** ADDIE.
 Status: draf. Format instrumen dapat diganti jika dosen/kampus sudah punya format baku (lihat `keputusan.md` PT-04).
@@ -141,7 +141,7 @@ Disarankan dua penilai menilai sebagian jawaban secara terpisah, lalu mendiskusi
 
 ## 9. Tes Mathematical Literacy (F17)
 
-**Tujuan:** menguji apakah MathSave membantu meningkatkan literasi matematis siswa pada materi Perbandingan Senilai dan Berbalik Nilai.
+**Tujuan:** menguji apakah Nalls membantu meningkatkan literasi matematis siswa pada materi Perbandingan Senilai dan Berbalik Nilai.
 
 **Instrumen:** 4 soal uraian dari "Tabel 2. Soal dan Kisi-kisi Jawaban Mathematical Literacy" (dokumen tugas, 12 Nov 2026), satu soal per indikator, skor per tahap penyelesaian, maks. 6 per soal, total 24. Teks soal dan rubrik di `src/content/ml-test.json` sama persis dengan dokumen (diperiksa `check_content.py`: jumlah skor tahap = skor maksimum).
 
@@ -157,7 +157,7 @@ Disarankan dua penilai menilai sebagian jawaban secara terpisah, lalu mendiskusi
 **Prosedur:**
 1. Siswa memilih kelas, lalu membuka **Tes awal** di peta belajar dan mengerjakan 4 soal (jawaban bebas, tanpa batas waktu), lalu **Kirim**.
 2. Guru/peneliti membuka **Penilaian tes (guru/peneliti)** di perangkat yang sama, mengisi **kode peserta** (bukan nama), lalu menilai tiap soal per tahap rubrik.
-3. Siswa belajar dengan MathSave.
+3. Siswa belajar dengan Nalls.
 4. Siswa mengerjakan **Tes akhir** (terbuka setelah tes awal dikirim); guru menilai dengan cara yang sama.
 5. Guru menekan **Unduh CSV rinci** (skor tiap tahap + jawaban) dan **Unduh CSV ringkasan** (skor per indikator awal/akhir, total, N-gain). File dibuka di Excel (pemisah `;`).
 

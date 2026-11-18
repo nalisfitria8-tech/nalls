@@ -1,4 +1,4 @@
-# Rancangan Desain — MathSave
+# Rancangan Desain — Nalls
 
 Dokumen ini menjelaskan tampilan, alur layar, struktur materi, dan contoh isi. Semua keputusan merujuk ke fitur di `PRD.md` (F01–F16) dan kode bukti wawancara S01 (temuan awal).
 
@@ -109,7 +109,7 @@ Soal (tandai angka & pertanyaan)
 
 ```
 ┌──────────────────────────────┐
-│          MathSave            │
+│            Nalls             │
 │                              │
 │  Masukkan kode siswa         │
 │  ┌────────────────────────┐  │

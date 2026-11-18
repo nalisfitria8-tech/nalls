@@ -42,7 +42,7 @@ describe('rute M2 dan gerbang DS02 (main.js)', () => {
   it('"jelaskan" tidak bisa dibuka sebelum lulus cek', async () => {
     store.update((s) => (s.m2.passed = false));
     await visit('#/m2/jelaskan');
-    expect(title()).toBe('MathSave');
+    expect(title()).toBe('Nalls');
   });
 
   it('layar M2-07 → latihan identifikasi', async () => {
@@ -146,7 +146,7 @@ describe('Tes literasi terdaftar di router (main.js)', () => {
     await visit('#/tes-ml/penilai/awal/0');
     expect(app().textContent).toContain('Tes awal belum dikirim siswa');
     await visit('#/tes-ml/salah');
-    expect(title()).toBe('MathSave'); // fase tidak dikenal → peta belajar
+    expect(title()).toBe('Nalls'); // fase tidak dikenal → peta belajar
   });
 });
 
@@ -156,7 +156,7 @@ describe('siswa baru: setelah memilih kelas ke peta belajar (Tes awal sebelum M0
     await visit('#/');
     [...app().querySelectorAll('button')].find((b) => b.textContent === 'Kelas VII').click();
     window.dispatchEvent(new Event('hashchange'));
-    expect(title()).toBe('MathSave');
+    expect(title()).toBe('Nalls');
     expect(app().textContent).toContain('Kerjakan Tes awal sebelum mulai belajar.');
     const modules = [...app().querySelectorAll('button.module')].map((b) => b.textContent);
     expect(modules[0]).toContain('Tes awal');

@@ -323,8 +323,8 @@ describe('unduh CSV dan peta belajar', () => {
 
     const id = store.get().ml.deviceId;
     expect(files.map(([n]) => n)).toEqual([
-      `mathsave-tes-literasi-rinci-${id}.csv`,
-      `mathsave-tes-literasi-ringkasan-${id}.csv`,
+      `nalls-tes-literasi-rinci-${id}.csv`,
+      `nalls-tes-literasi-ringkasan-${id}.csv`,
     ]);
     expect(files[0][1].split('\r\n')[1]).toContain(
       `${id};S07;7;awal;ML1;Mathematical Reasoning;1;2;1;1;1;;6;6;`

@@ -15,7 +15,7 @@ const STATUS_LABEL = {
  */
 export function gradeScreen({ onPick }) {
   return [
-    topBar('MathSave'),
+    topBar('Nalls'),
     h(
       'main',
       { class: 'screen' },
@@ -58,7 +58,7 @@ export function homeScreen({ state, titles, available, go, onReset, tests = null
   const statuses = moduleStatuses(state, available);
   const pretestPending = tests && tests[0].status !== 'terkirim' && tests[0].status !== 'dinilai';
   return [
-    topBar('MathSave', state.grade ? `Kelas ${state.grade === 7 ? 'VII' : 'VIII'}` : null),
+    topBar('Nalls', state.grade ? `Kelas ${state.grade === 7 ? 'VII' : 'VIII'}` : null),
     h(
       'main',
       { class: 'screen' },

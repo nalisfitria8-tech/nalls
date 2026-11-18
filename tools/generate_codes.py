@@ -41,7 +41,7 @@ def make_codes(prefix: str, count: int, existing: set[str] | None = None) -> lis
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Membuat kode siswa MathSave")
+    p = argparse.ArgumentParser(description="Membuat kode siswa Nalls")
     p.add_argument("--kelas", type=int, choices=[7, 8], required=True, help="kelas siswa (7 atau 8)")
     p.add_argument("--jumlah", type=int, required=True, help="banyak kode yang dibuat")
     p.add_argument("--awalan", required=True, help="awalan kode, misal M7A (huruf besar & angka, maks. 5)")

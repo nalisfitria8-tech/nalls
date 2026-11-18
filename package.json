@@ -1,9 +1,9 @@
 {
-  "name": "mathsave",
+  "name": "nalls",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "MathSave - belajar Perbandingan Senilai dan Berbalik Nilai",
+  "description": "Nalls - belajar Perbandingan Senilai dan Berbalik Nilai",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",

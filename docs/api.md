@@ -1,4 +1,4 @@
-# API dan Data — MathSave
+# API dan Data — Nalls
 
 Backend = **Supabase** (Postgres + Auth anonim + RPC + Row Level Security). Tidak ada server sendiri.
 Status: skema sudah ditulis di `supabase/migrations/0001_init.sql` (sama dengan SQL di bawah) tetapi **belum dijalankan**, karena proyek Supabase belum dibuat (KP-21). Aplikasi sudah membuat baris data dengan bentuk tabel ini dan menampungnya di antrean memori (§6); pengirimannya dikerjakan di C15.

@@ -1,4 +1,4 @@
-# Arsitektur — MathSave
+# Arsitektur — Nalls
 
 Status: **tahap Develop** (diperbarui 11 November 2026, setelah C11). Dokumen ini menjelaskan kode yang **sudah ada**; bagian yang belum dibangun ditandai *rencana* beserta nomor tugasnya di `task.md` bagian C.
 
@@ -7,7 +7,7 @@ Status: **tahap Develop** (diperbarui 11 November 2026, setelah C11). Dokumen in
 ```
  HP Android (browser Chrome)                Layanan online gratis
 ┌──────────────────────────────┐        ┌────────────────────────┐
-│ MathSave (web statis)        │        │ Netlify (hosting web)  │
+│ Nalls (web statis)           │        │ Netlify (hosting web)  │
 │  • Tampilan & alur belajar   │◄───────┤  file HTML/JS/CSS      │
 │  • Konten materi (JSON)      │        └────────────────────────┘
 │  • Pemeriksa jawaban lokal   │        ┌────────────────────────┐
@@ -137,7 +137,7 @@ Urutan M2: layar M2-01…07 → latihan → cek pemahaman → (lulus) jelaskan �
 
 ## 5. Keadaan belajar di perangkat (`src/data/store.js`)
 
-Disimpan di `localStorage` dengan kunci `mathsave:v1`. Jika penyimpanan diblokir browser, aplikasi tetap jalan (keadaan hilang saat halaman ditutup). Data lama dibaca dengan penggabungan bertingkat, sehingga perubahan bentuk tidak merusak kemajuan siswa. Setiap `store.get()`/`store.update()` membaca ulang salinan tersimpan terbaru, agar tab/jendela lain yang terbuka lebih dulu tidak menimpa data (misal jawaban tes) dengan keadaan lamanya.
+Disimpan di `localStorage` dengan kunci `mathsave:v1` (nama lama aplikasi; **sengaja tidak diganti** saat rename ke Nalls agar progres dan nilai siswa yang sudah tersimpan tidak hilang, KP-31). Jika penyimpanan diblokir browser, aplikasi tetap jalan (keadaan hilang saat halaman ditutup). Data lama dibaca dengan penggabungan bertingkat, sehingga perubahan bentuk tidak merusak kemajuan siswa. Setiap `store.get()`/`store.update()` membaca ulang salinan tersimpan terbaru, agar tab/jendela lain yang terbuka lebih dulu tidak menimpa data (misal jawaban tes) dengan keadaan lamanya.
 
 | Kunci | Isi |
 |---|---|

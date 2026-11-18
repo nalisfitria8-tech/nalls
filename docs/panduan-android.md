@@ -1,4 +1,4 @@
-# Panduan Singkat: Menjalankan MathSave di HP Android
+# Panduan Singkat: Menjalankan Nalls di HP Android
 
 Untuk guru/peneliti yang menyiapkan uji coba. Aplikasi berjalan dari laptop; HP siswa membukanya lewat Wi-Fi yang sama.
 
@@ -36,7 +36,7 @@ Jika halaman tidak terbuka: periksa Wi-Fi sama, alamat benar (termasuk `:4173`),
 - **Satu siswa = satu HP**, dan tes awal serta tes akhir dikerjakan **di HP yang sama**. Data hanya tersimpan di HP itu (belum ada server).
 - **Unduh CSV setiap selesai menilai.** Jika data Chrome dihapus atau mode penyamaran dipakai, jawaban dan nilai hilang.
 - Jangan pakai mode penyamaran (incognito).
-- Sebaiknya buka MathSave di **satu tab** saja. Sebelum mengirim, pastikan layar **Periksa** menunjukkan "Sudah diisi ✓"; tes tanpa satu pun jawaban tidak bisa dikirim.
+- Sebaiknya buka Nalls di **satu tab** saja. Sebelum mengirim, pastikan layar **Periksa** menunjukkan "Sudah diisi ✓"; tes tanpa satu pun jawaban tidak bisa dikirim.
 - Jika satu HP dipakai bergantian: unduh CSV dulu, baru ketuk **Mulai ulang (versi pengembangan)** untuk siswa berikutnya.
 - Layar penilai tidak berkata sandi. Guru membukanya sendiri, jangan oleh siswa.
 - Kode perangkat (misal `P-7KQ3MX`) di CSV dipakai untuk mencocokkan tes awal dan tes akhir siswa yang sama.

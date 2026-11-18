@@ -1,4 +1,4 @@
-# Daftar Tugas — MathSave
+# Daftar Tugas — Nalls
 
 Mengikuti tahap ADDIE. Tanda: `[x]` selesai · `[ ]` belum.
 **Aturan:** tahap Develop (coding) baru dimulai setelah semua tugas "Gerbang D" selesai.
@@ -89,6 +89,7 @@ Mengikuti tahap ADDIE. Tanda: `[x]` selesai · `[ ]` belum.
     - [x] KP-27–KP-30 disetujui pengembang (12 Nov 2026).
     - [x] Setelah memilih kelas, siswa diarahkan ke peta belajar (bukan langsung M0) agar Tes awal dikerjakan sebelum belajar (KP-29). Panduan HP: `docs/panduan-android.md`. Uji browser seluruh alur: tanpa error konsol.
     - [x] Perbaikan (laporan uji coba: penilai melihat "(kosong)"): `store.js` selalu membaca salinan tersimpan terbaru sebelum membaca/menulis, sehingga tab lain yang terbuka lebih dulu tidak menimpa jawaban; tes tidak bisa dikirim bila keempat jawaban kosong. Tes: `ml-flow.test.js` (dua tab, kirim kosong, data lama). Uji browser dengan ketikan sungguhan + dua tab: jawaban tampil di layar penilai.
+    - [x] Ganti nama MathSave → **Nalls** (KP-31): judul, metadata, dokumen, nama file CSV `nalls-tes-literasi-…`. Kunci penyimpanan `mathsave:v1` dipertahankan agar data siswa tidak hilang; fitur, materi, skor, dan database tidak berubah.
     - [x] Revisi tampilan: tema pink lembut + hijau tua lewat token (`tokens.css`, `docs/design.md` §3); hanya CSS + kelas judul bagian di peta belajar, logika/konten tidak berubah. Diuji 360 px dan 1280 px (tanpa gulir samping, tombol ≥ 48 px, tanpa error).
     - [x] Perbaikan layar Nilai (laporan uji coba: pilihan skor tampak sebagai "01", Simpan abu-abu): pilihan skor tiap tahap kini tombol radio asli berlabel (tetap bisa dipilih walau gaya tidak termuat), terpilih = isi biru + ✓; total & "x dari n tahap dinilai" diperbarui tanpa menggambar ulang layar; Simpan aktif setelah semua tahap dinilai. Tes `ml-flow.test.js` (pilih, ubah, simpan, buka ulang, awal & akhir). Uji browser 360 px dengan klik mouse dan sentuhan sungguhan: tes awal & akhir tersimpan dan tampil lagi saat dibuka ulang, tanpa error.
     - [ ] *Tidak menghalangi:* jawaban dosen PT-08 (skor sebagian, waktu tes akhir, kalimat soal ML4) — tetap menunggu.

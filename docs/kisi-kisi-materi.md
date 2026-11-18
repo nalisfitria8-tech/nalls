@@ -1,6 +1,6 @@
 # Kisi-Kisi Materi Perbandingan Senilai dan Berbalik Nilai
 
-**Media:** MathSave (aplikasi web pembelajaran, dapat diakses melalui ponsel Android)
+**Media:** Nalls (aplikasi web pembelajaran, dapat diakses melalui ponsel Android)
 **Sasaran:** Siswa SMP kelas VII (pembelajaran awal) dan kelas VIII (pengulangan dan pendalaman)
 **Tahap pengembangan:** ADDIE — tahap *Design*
 **Tanggal:** 11 November 2026

@@ -491,7 +491,7 @@ export function mlGraderHome({ test, store, go, download = defaultDownload }) {
         class: 'wide',
         disabled: !ml.awal.submittedAt,
         onClick: () => download(
-          `mathsave-tes-literasi-rinci-${meta().deviceId || 'perangkat'}.csv`,
+          `nalls-tes-literasi-rinci-${meta().deviceId || 'perangkat'}.csv`,
           toCsv(detailRows(test, store.get().ml, meta())),
         ),
       }, 'Unduh CSV rinci'),
@@ -500,7 +500,7 @@ export function mlGraderHome({ test, store, go, download = defaultDownload }) {
         class: 'wide',
         disabled: !ml.awal.submittedAt,
         onClick: () => download(
-          `mathsave-tes-literasi-ringkasan-${meta().deviceId || 'perangkat'}.csv`,
+          `nalls-tes-literasi-ringkasan-${meta().deviceId || 'perangkat'}.csv`,
           toCsv(summaryRows(test, store.get().ml, meta())),
         ),
       }, 'Unduh CSV ringkasan'),

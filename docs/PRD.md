@@ -1,4 +1,4 @@
-# PRD — MathSave
+# PRD — Nalls
 
 **Product Requirements Document**
 Materi: Perbandingan Senilai dan Berbalik Nilai
@@ -11,7 +11,7 @@ Versi dokumen: 0.1 (draf untuk diperiksa) · 11 November 2026
 
 ## 1. Ringkasan produk
 
-MathSave adalah aplikasi web responsif (nyaman dipakai di HP Android) untuk membantu siswa memahami **Perbandingan Senilai dan Berbalik Nilai**. Rancangan mengikuti **Cognitive Load Theory (CLT)**: materi dipecah kecil, tampil satu per satu, tabel diletakkan dekat teks, petunjuk diberikan bertahap, dan siswa mengatur tempo belajarnya sendiri.
+Nalls adalah aplikasi web responsif (nyaman dipakai di HP Android) untuk membantu siswa memahami **Perbandingan Senilai dan Berbalik Nilai**. Rancangan mengikuti **Cognitive Load Theory (CLT)**: materi dipecah kecil, tampil satu per satu, tabel diletakkan dekat teks, petunjuk diberikan bertahap, dan siswa mengatur tempo belajarnya sendiri.
 
 Tujuan pembelajaran utama adalah **Mathematical Literacy**: siswa mampu
 1. **merumuskan** situasi sehari-hari menjadi masalah perbandingan (Diketahui, Ditanya, jenis perbandingan),
@@ -351,7 +351,7 @@ Setiap fitur memuat: kode bukti, rasional CLT, perilaku yang diharapkan, dan ind
 - **Indikator uji:** halaman awal termuat < 3 detik di jaringan 3G cepat; Lighthouse aksesibilitas ≥ 90.
 
 ### F17 — Tes Mathematical Literacy (tes awal & tes akhir) · W · *fitur pendukung (evaluasi), bukan dari wawancara*
-- **Alasan:** tugas dosen pengampu — menguji apakah MathSave meningkatkan literasi matematis siswa (tujuan produk §1). Tidak ada kode bukti wawancara; fitur ini alat ukur, bukan bantuan belajar.
+- **Alasan:** tugas dosen pengampu — menguji apakah Nalls meningkatkan literasi matematis siswa (tujuan produk §1). Tidak ada kode bukti wawancara; fitur ini alat ukur, bukan bantuan belajar.
 - **Sumber soal:** "Tabel 2. Soal dan Kisi-kisi Jawaban Mathematical Literacy" (dokumen tugas pengembang, 12 Nov 2026): 4 soal, 4 indikator (Mathematical Reasoning; Formulating Situations Mathematically; Employing Mathematical Concepts, Facts, and Procedures; Interpreting, Applying, and Evaluating Mathematical Outcomes), rubrik per tahap, maks. 6 per soal, total 24. Teks soal dan rubrik disalin tanpa perubahan ke `src/content/ml-test.json`.
 - **Deskripsi:** soal yang sama dikerjakan sebagai **tes awal** (sebelum belajar) dan **tes akhir** (sesudah belajar). Satu soal per layar, jawaban **bebas** (siswa menulis langkah dan alasan), draf tersimpan otomatis, tanpa batas waktu. Setelah dikirim, jawaban terkunci. Guru/peneliti menilai di layar penilai: skor tiap tahap rubrik 0 sampai skor maksimum tahap itu. Siswa melihat skor total dan per kemampuan, **tanpa** kunci jawaban (agar tes akhir tetap sahih). Hasil diunduh sebagai CSV (rinci dan ringkasan + N-gain). Keputusan: KP-27–KP-30.
 - **Rasional CLT:** bukan fitur belajar; dipisah dari modul agar tidak menambah beban saat belajar. Tetap mengikuti aturan tampilan: satu soal per layar, tanpa penghitung waktu, tombol ≥ 48 px. Teks soal dari dokumen dosen bisa lebih dari ±40 kata (pengecualian; tidak diubah).

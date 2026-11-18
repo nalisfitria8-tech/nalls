@@ -1,4 +1,4 @@
-# AGENTS.md — Aturan kerja di repo MathSave
+# AGENTS.md — Aturan kerja di repo Nalls
 
 Berlaku untuk agen AI dan pengembang. Baca `docs/PRD.md` dan `docs/design.md` sebelum mengubah apa pun.
 
