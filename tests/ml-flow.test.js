@@ -4,10 +4,13 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import test from '../src/content/ml-test.json';
 import { store } from '../src/data/store.js';
 import { pendingEvents, clearEvents } from '../src/data/logger.js';
+import mlMcq from '../src/content/ml-mcq.json';
 import {
   mlIntroScreen, mlTaskScreen, mlSubmitScreen, mlResultScreen, mlGraderHome, mlGradeScreen, mlEntries, newDeviceId,
+  mlMcqIntroScreen, mlMcqScreen, mlMcqSubmitScreen,
 } from '../src/screens/mlTest.js';
 import { homeScreen } from '../src/screens/home.js';
+import { detailRows } from '../src/engine/mlScore.js';
 
 const $ = (root, sel) => root.querySelector(sel);
 const $$ = (root, sel) => [...root.querySelectorAll(sel)];
@@ -40,24 +43,44 @@ const type = (area, value) => {
   area.dispatchEvent(new Event('input'));
 };
 
-function takeTest(
-  phase,
-  answers = [
-    'B, karena 13.000/kg paling murah',
-    '3/12 = x/20',
-    '6 × 15 = 10 × x, x = 9 hari',
-    '18 menit, 32 salah',
-  ]
-) {
+/** Memilih opsi ke-`choice` (0 = A) pada PG nomor `index` (klik label, seperti mengetuk). */
+function pickMcq(phase, index, choice, c = ctx()) {
+  const root = mount(mlMcqScreen({ ...c, phase, index }));
+  $$(root, 'label.ml-mcq-option')[choice].click();
+  return root;
+}
+
+/** Mengirim uraian saja (bagian 1). */
+function takeEssays(phase, answers = [
+  'B, karena 13.000/kg paling murah',
+  '3/12 = x/20',
+  '6 × 15 = 10 × x, x = 9 hari',
+  '18 menit, 32 salah',
+]) {
   buttonByText(mount(mlIntroScreen({ ...ctx(), phase })), 'Mulai').click();
   answers.forEach((a, i) => {
     type($(mount(mlTaskScreen({ ...ctx(), phase, index: i })), 'textarea'), a);
   });
-
   const review = mount(mlSubmitScreen({ ...ctx(), phase }));
   buttonByText(review, 'Kirim jawaban').click();
   buttonByText(review, 'Ya, kirim').click();
 }
+
+/** Mengirim pilihan ganda (bagian 2). Bawaan: semua opsi A (semua salah; kunci 1, 2, 1, 1). */
+function takeMcq(phase, choices = [0, 0, 0, 0]) {
+  choices.forEach((ch, i) => ch !== null && pickMcq(phase, i, ch));
+  const review = mount(mlMcqSubmitScreen({ ...ctx(), phase }));
+  buttonByText(review, 'Kirim pilihan ganda').click();
+  buttonByText(review, 'Ya, kirim').click();
+}
+
+/** Tes lengkap: uraian lalu pilihan ganda. */
+function takeTest(phase, answers, choices) {
+  takeEssays(phase, answers);
+  takeMcq(phase, choices);
+}
+
+const OPTION_TEXTS = mlMcq.flatMap((q) => q.options);
 
 function grade(phase, index, values) {
   const c = ctx();
@@ -123,23 +146,23 @@ describe('siswa mengerjakan tes awal', () => {
     const c = ctx();
     const root = mount(mlSubmitScreen({ ...c, phase: 'awal' }));
 
-    expect(root.textContent).toContain('Esai nomor 2, 3, 4 belum diisi.');
-    expect(root.textContent).toContain('Pilihan ganda nomor 1, 2, 3, 4 belum dipilih.');
+    expect(root.textContent).toContain('Uraian nomor 2, 3, 4 belum diisi.');
+    expect(root.textContent).not.toContain('Pilihan ganda nomor');
 
     buttonByText(root, 'Kirim jawaban').click();
-    expect(root.textContent).toContain('Setelah dikirim, jawaban tidak bisa diubah');
+    expect(root.textContent).toContain('Setelah dikirim, jawaban uraian tidak bisa diubah');
     buttonByText(root, 'Batal').click();
     expect(store.get().ml.awal.submittedAt).toBeNull();
 
     buttonByText(root, 'Kirim jawaban').click();
     buttonByText(root, 'Ya, kirim').click();
-    expect(store.get().ml.awal.submittedAt).toBeTruthy();
-    expect(c.calls).toEqual(['#/tes-ml/awal/hasil']);
+    expect(store.get().ml.awal).toMatchObject({ submittedAt: expect.any(String), mcqSeparate: true, mcqSubmittedAt: null });
+    expect(c.calls).toEqual(['#/tes-ml/awal/pg']); // langsung ke bagian pilihan ganda
 
     const ev = pendingEvents().find((e) => e.row.type === 'ml_submit').row;
     expect(ev).toMatchObject({
       module_id: 'ML',
-      payload: { phase: 'awal', answers: { ML1: 'B' } },
+      payload: { phase: 'awal', part: 'uraian', answered: 1, answers: { ML1: 'B' } },
     });
   });
 
@@ -152,13 +175,36 @@ describe('siswa mengerjakan tes awal', () => {
     expect(store.get().ml.awal.submittedAt).toBeNull();
   });
 
-  it('setelah dikirim: soal tidak bisa dibuka/diubah lagi', () => {
+  it('setelah uraian dikirim: uraian terkunci, siswa diarahkan ke pilihan ganda', () => {
+    takeEssays('awal');
+    for (const nodes of [
+      mlTaskScreen({ ...ctx(), phase: 'awal', index: 0 }),
+      mlSubmitScreen({ ...ctx(), phase: 'awal' }),
+      mlIntroScreen({ ...ctx(), phase: 'awal' }),
+      mlResultScreen({ ...ctx(), phase: 'awal' }), // hasil belum boleh tampil
+    ]) {
+      const r = mount(nodes);
+      expect($(r, 'textarea')).toBeNull();
+      expect(r.textContent).toContain('Sekarang kerjakan 4 soal pilihan ganda');
+    }
+  });
+
+  it('setelah kedua bagian dikirim: uraian dan PG tidak bisa dibuka/diubah lagi', () => {
     takeTest('awal');
-    const again = mount(mlTaskScreen({ ...ctx(), phase: 'awal', index: 0 }));
-    expect($(again, 'textarea')).toBeNull();
-    expect(again.textContent).toContain('Jawabanmu sudah terkirim');
-    expect(mount(mlSubmitScreen({ ...ctx(), phase: 'awal' })).textContent).toContain('Jawabanmu sudah terkirim');
-    expect(mount(mlIntroScreen({ ...ctx(), phase: 'awal' })).textContent).toContain('Jawabanmu sudah terkirim');
+    const screens = [
+      mlTaskScreen({ ...ctx(), phase: 'awal', index: 0 }),
+      mlSubmitScreen({ ...ctx(), phase: 'awal' }),
+      mlIntroScreen({ ...ctx(), phase: 'awal' }),
+      mlMcqIntroScreen({ ...ctx(), phase: 'awal' }),
+      mlMcqScreen({ ...ctx(), phase: 'awal', index: 0 }),
+      mlMcqSubmitScreen({ ...ctx(), phase: 'awal' }),
+    ];
+    for (const nodes of screens) {
+      const r = mount(nodes);
+      expect($(r, 'textarea')).toBeNull();
+      expect($(r, 'label.ml-mcq-option')).toBeNull();
+      expect(r.textContent).toContain('Jawabanmu sudah terkirim');
+    }
   });
 
   it('kemajuan modul saat mengirim dicatat', () => {
@@ -168,13 +214,114 @@ describe('siswa mengerjakan tes awal', () => {
   });
 });
 
+describe('pilihan ganda di halaman terpisah, setelah uraian (KP-35)', () => {
+  it('opsi PG TIDAK pernah tampil sebelum uraian dikirim (layar uraian, periksa, maupun alamat PG langsung)', () => {
+    buttonByText(mount(mlIntroScreen({ ...ctx(), phase: 'awal' })), 'Mulai').click();
+    const screens = [
+      ...test.tasks.map((_, i) => mlTaskScreen({ ...ctx(), phase: 'awal', index: i })),
+      mlSubmitScreen({ ...ctx(), phase: 'awal' }),
+      mlMcqIntroScreen({ ...ctx(), phase: 'awal' }),
+      ...mlMcq.map((_, i) => mlMcqScreen({ ...ctx(), phase: 'awal', index: i })),
+      mlMcqSubmitScreen({ ...ctx(), phase: 'awal' }),
+    ];
+    for (const nodes of screens) {
+      const r = mount(nodes);
+      expect($(r, 'label.ml-mcq-option')).toBeNull();
+      expect(r.textContent).not.toContain('Pilihan ganda');
+      for (const opt of OPTION_TEXTS.filter((o) => !/^\d+ (gelas|hari|menit)$/.test(o))) expect(r.textContent).not.toContain(opt);
+      for (const opt of ['4 gelas', '25 hari', '16 menit', '20 menit']) expect(r.textContent).not.toContain(opt);
+      for (const q of mlMcq) expect(r.textContent).not.toContain(q.question);
+    }
+    expect(store.get().ml.awal.mcqAnswers).toEqual({});
+  });
+
+  it('satu soal PG per layar, opsi A–D, pilihan tersimpan dan bisa diubah', () => {
+    takeEssays('awal');
+    expect(mount(mlMcqIntroScreen({ ...ctx(), phase: 'awal' })).textContent).toContain('Jawaban uraianmu sudah terkirim');
+    const root = mount(mlMcqScreen({ ...ctx(), phase: 'awal', index: 0 }));
+    expect($(root, '.progress').textContent).toBe('Pilihan ganda 1/4');
+    expect(root.textContent).toContain(mlMcq[0].question);
+    expect($$(root, 'label.ml-mcq-option').map((l) => l.textContent)).toEqual(['A. Toko A', 'B. Toko B', 'C. Toko C', 'D. Semua sama']);
+    expect(root.textContent).not.toContain(mlMcq[1].question); // satu soal per layar
+    $$(root, 'label.ml-mcq-option')[2].click();
+    expect(store.get().ml.awal.mcqAnswers).toEqual({ PG1: 2 });
+    $$(root, 'label.ml-mcq-option')[1].click();
+    expect(store.get().ml.awal.mcqAnswers).toEqual({ PG1: 1 });
+    const again = mount(mlMcqScreen({ ...ctx(), phase: 'awal', index: 0 }));
+    expect($$(again, 'input[type=radio]').map((i) => i.checked)).toEqual([false, true, false, false]);
+  });
+
+  it('navigasi PG: Kembali/Lanjut, nomor terakhir → periksa', () => {
+    takeEssays('awal');
+    const c = ctx();
+    buttonByText(mount(mlMcqScreen({ ...c, phase: 'awal', index: 0 })), 'Kembali').click();
+    buttonByText(mount(mlMcqScreen({ ...c, phase: 'awal', index: 0 })), 'Lanjut').click();
+    buttonByText(mount(mlMcqScreen({ ...c, phase: 'awal', index: 3 })), 'Periksa jawaban').click();
+    expect(c.calls).toEqual(['#/tes-ml/awal/pg', '#/tes-ml/awal/pg/1', '#/tes-ml/awal/pg/kirim']);
+  });
+
+  it('kirim PG: boleh belum lengkap (dengan peringatan); semua kosong → tidak bisa', () => {
+    takeEssays('awal');
+    let root = mount(mlMcqSubmitScreen({ ...ctx(), phase: 'awal' }));
+    expect(root.textContent).toContain('Belum ada pilihan yang dipilih');
+    expect(buttonByText(root, 'Kirim pilihan ganda')).toBeUndefined();
+
+    pickMcq('awal', 0, 1);
+    const c = ctx();
+    root = mount(mlMcqSubmitScreen({ ...c, phase: 'awal' }));
+    expect(root.textContent).toContain('Pilihan ganda nomor 2, 3, 4 belum dipilih.');
+    buttonByText(root, 'Kirim pilihan ganda').click();
+    buttonByText(root, 'Ya, kirim').click();
+    expect(store.get().ml.awal).toMatchObject({ mcqSubmittedAt: expect.any(String), mcqAnswers: { PG1: 1 }, mcqLegacyOpen: false });
+    expect(c.calls).toEqual(['#/tes-ml/awal/hasil']);
+    const ev = pendingEvents().filter((e) => e.row.type === 'ml_submit').at(-1).row;
+    expect(ev.payload).toEqual({ phase: 'awal', part: 'pg', answered: 1, mcqAnswers: { PG1: 1 } });
+  });
+
+  it('kunci PG hanya ditampilkan setelah tes AKHIR', () => {
+    takeTest('awal', undefined, [1, 2, 1, 1]);
+    const awal = mount(mlResultScreen({ ...ctx(), phase: 'awal' }));
+    expect(awal.textContent).toContain('Kunci jawaban tidak ditampilkan');
+    expect(awal.textContent).not.toContain('Jawaban benar:');
+    takeTest('akhir', undefined, [1, 0, 1, 1]);
+    const akhir = mount(mlResultScreen({ ...ctx(), phase: 'akhir' }));
+    expect(akhir.textContent).toContain('Skor pilihan ganda: 3 dari 4');
+    expect(akhir.textContent).toContain('Jawaban benar: 5 gelas');
+  });
+
+  it('peta belajar & penilai: uraian terkirim, PG belum', () => {
+    takeEssays('awal');
+    const home = mount(homeScreen({ state: store.get(), titles: {}, available: [], go: () => {}, onReset: () => {}, tests: mlEntries(test, store.get().ml) }));
+    const btn = (label) => $$(home, 'button.module').find((b) => b.textContent.startsWith(label));
+    expect(btn('Tes awal').textContent).toContain('Lanjutkan pilihan ganda');
+    expect(btn('Tes akhir').disabled).toBe(true);
+    const grader = mount(mlGraderHome(ctx()));
+    expect(grader.textContent).toContain('Uraian terkirim, pilihan ganda belum');
+    expect(grader.textContent).toContain('Pilihan ganda: belum dikirim siswa. Uraian sudah bisa dinilai.');
+    const awalButtons = $$($$(grader, '.ml-phase')[0], 'button.choice');
+    expect(awalButtons).toHaveLength(4);
+    expect(awalButtons.every((b) => !b.disabled)).toBe(true); // uraian tes awal sudah bisa dinilai
+  });
+
+  it('uraian dinilai sebelum PG dikirim → waktu penilaian tetap tercatat, total menunggu PG', () => {
+    takeEssays('awal');
+    FULL.forEach((v, i) => grade('awal', i, v));
+    expect(store.get().ml.awal.scoredAt).toBeTruthy();
+    expect(mount(mlGraderHome(ctx())).textContent).not.toContain('24/28');
+    takeMcq('awal', [1, 2, 1, 1]);
+    expect(mount(mlGraderHome(ctx())).textContent).toContain('Tes awal · Sudah dinilai · 28/28');
+  });
+});
+
 describe('tes akhir', () => {
-  it('terkunci sampai tes awal dikirim', () => {
+  it('terkunci sampai uraian DAN pilihan ganda tes awal dikirim', () => {
     const c = ctx();
     const root = mount(mlIntroScreen({ ...c, phase: 'akhir' }));
     expect(root.textContent).toContain('Kerjakan tes awal dulu');
     expect(buttonByText(root, 'Mulai')).toBeUndefined();
-    takeTest('awal');
+    takeEssays('awal');
+    expect(buttonByText(mount(mlIntroScreen({ ...ctx(), phase: 'akhir' })), 'Mulai')).toBeUndefined();
+    takeMcq('awal');
     expect(buttonByText(mount(mlIntroScreen({ ...ctx(), phase: 'akhir' })), 'Mulai')).toBeDefined();
   });
 
@@ -467,6 +614,82 @@ describe('muat ulang halaman: draf dan nilai tetap ada', () => {
       phase: 'awal',
       index: 0,
     })), '.ml-student-answer').textContent).toBe('lama');
+  });
+
+  // Data uji coba ALUR LAMA: uraian + PG dikirim bersamaan (sebelum KP-35).
+  const legacyRecord = () => ({
+    grade: 7,
+    progress: { M1: 'selesai' },
+    ml: {
+      deviceId: 'P-LAMA01',
+      participant: 'P01',
+      awal: {
+        answers: { ML1: 'jawaban lama 1', ML2: 'jawaban lama 2' },
+        mcqAnswers: { PG1: 1, PG2: 0, PG3: 1 },
+        startedAt: '2026-11-12T06:49:40.722Z',
+        submittedAt: '2026-11-12T06:51:38.636Z',
+        progressAtSubmit: {},
+        scores: { ML1: [1, 2, 1, 1, 1] },
+        scoredAt: null,
+      },
+    },
+  });
+
+  it('data alur lama (PG sudah dijawab): tetap terkirim, tidak dibuka ulang, skor PG & CSV "bersamaan (alur lama)"', async () => {
+    localStorage.setItem('mathsave:v1', JSON.stringify(legacyRecord()));
+    const before = localStorage.getItem('mathsave:v1');
+    const s = await freshStore();
+    const c = ctx({ store: s });
+
+    // siswa: langsung ke hasil, tidak diminta mengerjakan PG lagi
+    expect(mount(mlIntroScreen({ ...c, phase: 'awal' })).textContent).toContain('Jawabanmu sudah terkirim');
+    expect($(mount(mlMcqScreen({ ...c, phase: 'awal', index: 3 })), 'label.ml-mcq-option')).toBeNull();
+    // tes akhir terbuka
+    expect(mlEntries(test, s.get().ml)[1].enabled).toBe(true);
+    // penilai: skor PG otomatis 2 (PG1 & PG3 benar), ditandai alur lama
+    const grader = mount(mlGraderHome(c));
+    expect(grader.textContent).toContain('Skor pilihan ganda otomatis: 2/4 (alur lama: dikerjakan bersamaan dengan uraian)');
+    // CSV: jawaban uraian & PG lengkap, urutan ditandai
+    const rows = detailRows(test, s.get().ml, { deviceId: 'P-LAMA01', participant: 'P01', grade: 7 });
+    const h = rows[0];
+    expect(rows[1][h.indexOf('jawaban')]).toBe('jawaban lama 1');
+    expect(rows[1].slice(h.indexOf('jawaban_pg_1'), h.indexOf('skor_pg') + 1)).toEqual(['Toko B', '3 gelas', '9 hari', '', 2]);
+    expect(rows[1][h.indexOf('urutan_pg')]).toBe('bersamaan (alur lama)');
+    expect(rows[1][h.indexOf('pg_dikirim')]).toBe('2026-11-12T06:51:38.636Z');
+    // membaca & membuka layar tidak mengubah data tersimpan
+    expect(localStorage.getItem('mathsave:v1')).toBe(before);
+    // menilai uraian hanya menambah skor; jawaban & pilihan lama tetap
+    FULL.slice(1).forEach((v, i) => {
+      const root = mount(mlGradeScreen({ ...c, phase: 'awal', index: i + 1 }));
+      v.forEach((val, j) => pickScore(root, j, val));
+      buttonByText(root, 'Simpan nilai').click();
+    });
+    const after = JSON.parse(localStorage.getItem('mathsave:v1')).ml.awal;
+    expect(after.answers).toEqual(legacyRecord().ml.awal.answers);
+    expect(after.mcqAnswers).toEqual(legacyRecord().ml.awal.mcqAnswers);
+    expect(after.submittedAt).toBe(legacyRecord().ml.awal.submittedAt);
+    expect(mount(mlGraderHome(c)).textContent).toContain('Tes awal · Sudah dinilai · 26/28');
+  });
+
+  it('data alur lama TANPA jawaban PG: uraian tetap terkirim, siswa diminta mengerjakan PG; CSV menandai opsi sempat terlihat', async () => {
+    const rec = legacyRecord();
+    rec.ml.awal.mcqAnswers = {};
+    localStorage.setItem('mathsave:v1', JSON.stringify(rec));
+    const s = await freshStore();
+    const c = ctx({ store: s });
+    expect(mount(mlIntroScreen({ ...c, phase: 'awal' })).textContent).toContain('Sekarang kerjakan 4 soal pilihan ganda');
+    expect(mlEntries(test, s.get().ml)[1].enabled).toBe(false);
+    $$(mount(mlMcqScreen({ ...c, phase: 'awal', index: 0 })), 'label.ml-mcq-option')[1].click();
+    // satu pilihan sudah diisi tetapi BELUM dikirim → masih bagian PG, bukan "terkirim bersamaan"
+    expect(mlEntries(test, s.get().ml)[0].status).toBe('pg');
+    expect($$(mount(mlMcqScreen({ ...c, phase: 'awal', index: 1 })), 'label.ml-mcq-option')).toHaveLength(4);
+    const review = mount(mlMcqSubmitScreen({ ...c, phase: 'awal' }));
+    buttonByText(review, 'Kirim pilihan ganda').click();
+    buttonByText(review, 'Ya, kirim').click();
+    const saved = s.get().ml.awal;
+    expect(saved).toMatchObject({ mcqLegacyOpen: true, submittedAt: rec.ml.awal.submittedAt, answers: rec.ml.awal.answers });
+    const rows = detailRows(test, s.get().ml, { deviceId: 'x', participant: '', grade: 7 });
+    expect(rows[1][rows[0].indexOf('urutan_pg')]).toBe('setelah uraian (opsi sempat terlihat di alur lama)');
   });
 
   it('data lama tanpa bagian tes tetap terbaca', async () => {

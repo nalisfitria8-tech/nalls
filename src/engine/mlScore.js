@@ -3,15 +3,53 @@ import mlMcq from '../content/ml-mcq.json';
 
 export const PHASES = ['awal', 'akhir'];
 
+/**
+ * Satu fase tes (awal/akhir). Urutan (KP-35): uraian dikirim dulu (`submittedAt`),
+ * lalu pilihan ganda di halaman terpisah (`mcqSubmittedAt`).
+ *   mcqSeparate     true jika uraian dikirim dengan alur baru (PG belum pernah tampil)
+ *   mcqLegacyOpen   true jika PG dikerjakan setelah uraian yang dikirim dengan alur lama
+ *                   (opsi PG sudah terlihat di layar uraian)
+ */
 export const emptyPhase = () => ({
   answers: {},
   mcqAnswers: {},
   startedAt: null,
   submittedAt: null,
+  mcqSubmittedAt: null,
+  mcqSeparate: false,
+  mcqLegacyOpen: false,
   progressAtSubmit: null,
   scores: {},
   scoredAt: null,
 });
+
+/**
+ * Data alur lama (sebelum KP-35): uraian dan PG dikirim bersamaan. Dikenali TANPA
+ * mengubah data tersimpan: uraian terkirim, ada jawaban PG, tanpa tanda alur baru.
+ */
+export const isLegacyCombined = (phase) =>
+  Boolean(phase?.submittedAt) &&
+  !phase.mcqSubmittedAt &&
+  !phase.mcqSeparate &&
+  !phase.mcqLegacyOpen && // PG sedang dikerjakan di halaman terpisah (data lama tanpa jawaban PG)
+  mlMcq.some((q) => phase.mcqAnswers?.[q.id] !== undefined);
+
+/** Bagian pilihan ganda sudah dikirim (alur baru) atau dianggap terkirim (alur lama). */
+export const mcqSubmitted = (phase) => Boolean(phase?.mcqSubmittedAt) || isLegacyCombined(phase);
+
+/** Waktu kirim PG (alur lama: sama dengan waktu kirim uraian). */
+export const mcqSubmittedTime = (phase) =>
+  phase?.mcqSubmittedAt ?? (isLegacyCombined(phase) ? phase.submittedAt : null);
+
+/** Keterangan urutan untuk CSV. */
+export function mcqOrder(phase) {
+  if (isLegacyCombined(phase)) return 'bersamaan (alur lama)';
+  if (!phase?.mcqSubmittedAt) return '';
+  return phase.mcqLegacyOpen ? 'setelah uraian (opsi sempat terlihat di alur lama)' : 'setelah uraian';
+}
+
+/** Semua jawaban uraian sudah dinilai penuh. */
+export const essaysScored = (test, phase) => test.tasks.every((t) => taskScore(t, phase?.scores?.[t.id]) !== null);
 
 export function validStageScores(task, scores) {
   return (
@@ -32,18 +70,19 @@ export function taskScore(task, scores) {
     : null;
 }
 
+/**
+ * belum → mengerjakan (uraian) → pg (uraian terkirim, PG belum) → terkirim → dinilai
+ * 'dinilai' = kedua bagian terkirim dan semua uraian sudah dinilai.
+ */
 export function phaseStatus(test, phase) {
   if (!phase?.submittedAt) {
     return phase?.startedAt ? 'mengerjakan' : 'belum';
   }
-
-  return test.tasks.every(
-    (t) => taskScore(t, phase.scores?.[t.id]) !== null
-  )
-    ? 'dinilai'
-    : 'terkirim';
+  if (!mcqSubmitted(phase)) return 'pg';
+  return essaysScored(test, phase) ? 'dinilai' : 'terkirim';
 }
 
+/** Skor PG (1 per jawaban benar). Rumus tidak berubah; hanya dihitung setelah PG dikirim. */
 export function mcqScore(phase) {
   if (!phase) return 0;
 
@@ -65,13 +104,14 @@ export function phaseSummary(test, phase) {
 
   const status = phaseStatus(test, phase);
 
-  const essayTotal = status === 'dinilai'
+  // skor uraian bisa terlihat begitu semua uraian dinilai; total baru ada jika PG juga terkirim
+  const essayTotal = phase?.submittedAt && essaysScored(test, phase)
     ? perTask.reduce((a, t) => a + t.score, 0)
     : null;
 
-  const total = essayTotal === null
-    ? null
-    : essayTotal + mcqScore(phase);
+  const total = status === 'dinilai'
+    ? essayTotal + mcqScore(phase)
+    : null;
 
   const max = test.maxScore + mlMcq.length;
 
@@ -80,7 +120,7 @@ export function phaseSummary(test, phase) {
     total,
     max,
     essayTotal,
-    mcqTotal: phase?.submittedAt ? mcqScore(phase) : null,
+    mcqTotal: mcqSubmitted(phase) ? mcqScore(phase) : null,
     mcqMax: mlMcq.length,
     perTask,
   };
@@ -155,6 +195,8 @@ export function detailRows(test, ml, meta) {
     'dinilai',
     'modul_selesai_saat_kirim',
     'jawaban',
+    'pg_dikirim',
+    'urutan_pg',
   ];
 
   const rows = [header];
@@ -167,6 +209,8 @@ export function detailRows(test, ml, meta) {
       .filter(([, v]) => v === 'selesai')
       .map(([k]) => k)
       .join(' ');
+
+    const pgDone = mcqSubmitted(phase);
 
     for (const task of test.tasks) {
       const scores = phase.scores?.[task.id];
@@ -191,15 +235,17 @@ export function detailRows(test, ml, meta) {
         task.maxScore,
         ...mlMcq.map((q) => {
           const answer = phase.mcqAnswers?.[q.id];
-          return answer === undefined
+          return !pgDone || answer === undefined
             ? ''
             : q.options[answer] ?? '';
         }),
-        mcqScore(phase),
+        pgDone ? mcqScore(phase) : '',
         phase.submittedAt,
         phase.scoredAt ?? '',
         done,
         phase.answers?.[task.id] ?? '',
+        mcqSubmittedTime(phase) ?? '',
+        mcqOrder(phase),
       ]);
     }
   }
@@ -229,6 +275,8 @@ export function summaryRows(test, ml, meta) {
     'skor_maks',
     'n_gain',
     'kategori_n_gain',
+    'awal_urutan_pg',
+    'akhir_urutan_pg',
   ];
 
   const row = [
@@ -246,6 +294,8 @@ export function summaryRows(test, ml, meta) {
     max,
     decimal(g),
     nGainCategory(g) ?? '',
+    mcqOrder(ml.awal),
+    mcqOrder(ml.akhir),
   ];
 
   return [header, row];

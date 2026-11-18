@@ -1,8 +1,21 @@
-
+/**
+ * Tes Mathematical Literacy (F17): 4 soal uraian + 4 soal pilihan ganda (PG), maks. 24 + 4 = 28.
+ * Urutan (KP-35): uraian dikerjakan & dikirim dulu; PG baru tampil di halaman terpisah
+ * setelah uraian terkirim, agar pilihan jawaban PG tidak membantu menjawab uraian.
+ *
+ * Siswa:  #/tes-ml/<fase>                 pengantar
+ *         #/tes-ml/<fase>/<n>             uraian ke-n (draf tersimpan otomatis)
+ *         #/tes-ml/<fase>/kirim           periksa & kirim uraian (lalu terkunci)
+ *         #/tes-ml/<fase>/pg              pengantar PG (hanya setelah uraian terkirim)
+ *         #/tes-ml/<fase>/pg/<n>          PG ke-n, satu soal per layar
+ *         #/tes-ml/<fase>/pg/kirim        periksa & kirim PG (lalu terkunci)
+ *         #/tes-ml/<fase>/hasil           hasil (kunci PG hanya setelah tes akhir)
+ * Penilai: #/tes-ml/penilai[/<fase>/<n>]
+ */
 import { h, fill } from '../components/dom.js';
 import { topBar, feedbackBox } from '../components/question.js';
 import {
-  PHASES, phaseStatus, phaseSummary, taskScore, isAnswered,
+  PHASES, phaseSummary, taskScore, isAnswered, mcqSubmitted, essaysScored, isLegacyCombined,
   nGain, nGainCategory, toCsv, detailRows, summaryRows,
 } from '../engine/mlScore.js';
 import { logEvent } from '../data/logger.js';
@@ -11,9 +24,18 @@ import mlMcq from '../content/ml-mcq.json';
 const STATUS_TEXT = {
   belum: 'Belum dikerjakan',
   mengerjakan: 'Sedang dikerjakan',
+  pg: 'Uraian terkirim, pilihan ganda belum',
   terkirim: 'Terkirim, menunggu nilai',
   dinilai: 'Sudah dinilai',
 };
+
+/** Ke mana siswa diarahkan jika membuka layar yang sudah tidak berlaku. */
+function redirectFor({ test, phase, store, go }) {
+  const p = store.get().ml[phase];
+  if (!p.startedAt) return mlIntroScreen({ test, phase, store, go });
+  if (!p.submittedAt) return null;
+  return mcqSubmitted(p) ? mlResultScreen({ test, phase, store, go }) : mlMcqIntroScreen({ test, phase, store, go });
+}
 
 export function newDeviceId(rnd = Math.random) {
   const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
@@ -28,7 +50,8 @@ const phaseLabel = (test, phase) => test.phases[phase];
 export function mlEntries(test, ml) {
   return PHASES.map((phase) => {
     const sum = phaseSummary(test, ml?.[phase]);
-    const enabled = phase === 'awal' || Boolean(ml?.awal?.submittedAt);
+    // tes akhir terbuka setelah uraian DAN pilihan ganda tes awal terkirim
+    const enabled = phase === 'awal' || mcqSubmitted(ml?.awal);
     return {
       phase,
       label: phaseLabel(test, phase),
@@ -55,7 +78,7 @@ function taskText(task) {
 export function mlIntroScreen({ test, phase, store, go }) {
   const ml = store.get().ml;
 
-  if (phase === 'akhir' && !ml.awal.submittedAt) {
+  if (phase === 'akhir' && !mcqSubmitted(ml.awal)) {
     return [
       topBar(phaseLabel(test, phase)),
       h(
@@ -71,9 +94,7 @@ export function mlIntroScreen({ test, phase, store, go }) {
     ];
   }
 
-  if (ml[phase].submittedAt) {
-    return mlResultScreen({ test, phase, store, go });
-  }
+  if (ml[phase].submittedAt) return redirectFor({ test, phase, store, go });
 
   const started = Boolean(ml[phase].startedAt);
 
@@ -105,50 +126,11 @@ export function mlIntroScreen({ test, phase, store, go }) {
 
 export function mlTaskScreen({ test, phase, index, store, go }) {
   const ml = store.get().ml;
-
-  if (ml[phase].submittedAt) {
-    return mlResultScreen({ test, phase, store, go });
-  }
-  if (!ml[phase].startedAt) {
-    return mlIntroScreen({ test, phase, store, go });
-  }
+  const redirect = redirectFor({ test, phase, store, go });
+  if (redirect) return redirect;
 
   const task = test.tasks[index];
-  const mcq = mlMcq[index];
   const last = index === test.tasks.length - 1;
-
-  const mcqBlock = h(
-    'section',
-    { class: 'ml-mcq' },
-    h('p', {}, h('strong', {}, 'Pilihan Ganda')),
-    h('p', {}, mcq.question),
-    h(
-      'div',
-      { class: 'ml-mcq-options' },
-      mcq.options.map((option, i) => {
-        const input = h('input', {
-          type: 'radio',
-          name: `${phase}-${mcq.id}`,
-          value: String(i),
-        });
-
-        input.checked = ml[phase].mcqAnswers?.[mcq.id] === i;
-        input.addEventListener('change', () => {
-          store.update((s) => {
-            if (!s.ml[phase].mcqAnswers) s.ml[phase].mcqAnswers = {};
-            s.ml[phase].mcqAnswers[mcq.id] = i;
-          });
-        });
-
-        return h(
-          'label',
-          { class: 'ml-mcq-option' },
-          input,
-          h('span', {}, option),
-        );
-      }),
-    ),
-  );
 
   const area = h('textarea', {
     class: 'ml-answer',
@@ -170,7 +152,6 @@ export function mlTaskScreen({ test, phase, index, store, go }) {
       'main',
       { class: 'screen', 'data-task-id': task.id },
       h('div', { class: 'problem ml-problem' }, taskText(task)),
-      mcqBlock,
       h('label', { class: 'ml-label' }, 'Jawabanmu (tulis langkah dan alasannya):'),
       area,
       h('p', { class: 'note ml-note' }, 'Jawaban tersimpan otomatis.'),
@@ -197,24 +178,14 @@ export function mlTaskScreen({ test, phase, index, store, go }) {
 
 export function mlSubmitScreen({ test, phase, store, go }) {
   const ml = store.get().ml;
-
-  if (ml[phase].submittedAt) {
-    return mlResultScreen({ test, phase, store, go });
-  }
-  if (!ml[phase].startedAt) {
-    return mlIntroScreen({ test, phase, store, go });
-  }
+  const redirect = redirectFor({ test, phase, store, go });
+  if (redirect) return redirect;
 
   const main = h('main', { class: 'screen' });
   const answers = ml[phase].answers;
-  const mcqAnswers = ml[phase].mcqAnswers ?? {};
 
   const emptyEssay = test.tasks
     .map((t, i) => isAnswered(answers[t.id]) ? null : i + 1)
-    .filter(Boolean);
-
-  const emptyMcq = mlMcq
-    .map((q, i) => mcqAnswers[q.id] === undefined ? i + 1 : null)
     .filter(Boolean);
 
   const list = h(
@@ -244,54 +215,46 @@ export function mlSubmitScreen({ test, phase, store, go }) {
 
   function send() {
     const state = store.get();
-    const hasEssay = test.tasks.some(
-      (t) => isAnswered(state.ml[phase].answers[t.id]),
-    );
-    const hasMcq = mlMcq.some(
-      (q) => state.ml[phase].mcqAnswers?.[q.id] !== undefined,
-    );
-
-    if (!hasEssay && !hasMcq) return draw(false);
+    const hasEssay = test.tasks.some((t) => isAnswered(state.ml[phase].answers[t.id]));
+    if (!hasEssay) return draw(false);
 
     store.update((s) => {
       s.ml[phase].submittedAt = new Date().toISOString();
       s.ml[phase].progressAtSubmit = { ...state.progress };
+      s.ml[phase].mcqSeparate = true; // alur baru: PG belum pernah tampil
     });
 
     logEvent('ml_submit', {
       module_id: 'ML',
       payload: {
         phase,
-        answers: { ...answers },
-        mcqAnswers: { ...mcqAnswers },
+        part: 'uraian',
+        answered: test.tasks.filter((t) => isAnswered(state.ml[phase].answers[t.id])).length,
+        answers: { ...state.ml[phase].answers },
       },
     });
 
-    go(`#/tes-ml/${phase}/hasil`);
+    go(`#/tes-ml/${phase}/pg`);
   }
 
   function draw(confirming) {
-    const noAnswer = emptyEssay.length === test.tasks.length &&
-      emptyMcq.length === mlMcq.length;
+    const noAnswer = emptyEssay.length === test.tasks.length;
 
     fill(
       main,
-      h('p', {}, 'Periksa lagi jawabanmu. Ketuk soal untuk mengubahnya.'),
+      h('p', {}, 'Periksa lagi jawaban uraianmu. Ketuk soal untuk mengubahnya.'),
       list,
       noAnswer
         ? feedbackBox('info', null, 'Belum ada jawaban yang tersimpan. Isi jawabanmu dulu, lalu kirim.')
         : null,
-      emptyEssay.length
-        ? feedbackBox('info', null, `Esai nomor ${emptyEssay.join(', ')} belum diisi.`)
-        : null,
-      emptyMcq.length
-        ? feedbackBox('info', null, `Pilihan ganda nomor ${emptyMcq.join(', ')} belum dipilih.`)
+      !noAnswer && emptyEssay.length
+        ? feedbackBox('info', null, `Uraian nomor ${emptyEssay.join(', ')} belum diisi.`)
         : null,
       noAnswer
         ? null
         : confirming
           ? [
-              h('p', {}, h('strong', {}, 'Setelah dikirim, jawaban tidak bisa diubah. Kirim sekarang?')),
+              h('p', {}, h('strong', {}, 'Setelah dikirim, jawaban uraian tidak bisa diubah. Lalu kamu mengerjakan 4 soal pilihan ganda. Kirim sekarang?')),
               h('button', {
                 type: 'button',
                 class: 'primary wide',
@@ -312,11 +275,150 @@ export function mlSubmitScreen({ test, phase, store, go }) {
   }
 
   draw(false);
-  return [topBar(phaseLabel(test, phase), 'Periksa'), main];
+  return [topBar(phaseLabel(test, phase), 'Periksa uraian'), main];
+}
+
+// ---------------------------------------------------------------------------
+// Pilihan ganda: hanya setelah uraian terkirim (KP-35)
+// ---------------------------------------------------------------------------
+
+/** Pengalihan khusus layar PG: belum kirim uraian → kembali ke uraian; PG terkirim → hasil. */
+function mcqGuard({ test, phase, store, go }) {
+  const p = store.get().ml[phase];
+  if (!p.startedAt) return mlIntroScreen({ test, phase, store, go });
+  if (!p.submittedAt) return mlTaskScreen({ test, phase, index: 0, store, go });
+  if (mcqSubmitted(p)) return mlResultScreen({ test, phase, store, go });
+  return null;
+}
+
+export function mlMcqIntroScreen({ test, phase, store, go }) {
+  const guard = mcqGuard({ test, phase, store, go });
+  if (guard) return guard;
+  const started = Object.keys(store.get().ml[phase].mcqAnswers ?? {}).length > 0;
+  return [
+    topBar(phaseLabel(test, phase), 'Pilihan ganda'),
+    h(
+      'main',
+      { class: 'screen' },
+      h('p', {}, 'Jawaban uraianmu sudah terkirim. Terima kasih!'),
+      h('p', {}, `Sekarang kerjakan ${mlMcq.length} soal pilihan ganda. Pilih satu jawaban di setiap soal.`),
+      h('button', { type: 'button', class: 'primary wide', onClick: () => go(`#/tes-ml/${phase}/pg/0`) }, started ? 'Lanjutkan' : 'Mulai pilihan ganda'),
+    ),
+  ];
+}
+
+export function mlMcqScreen({ test, phase, index, store, go }) {
+  const guard = mcqGuard({ test, phase, store, go });
+  if (guard) return guard;
+
+  const q = mlMcq[index];
+  const last = index === mlMcq.length - 1;
+  const chosen = store.get().ml[phase].mcqAnswers?.[q.id];
+
+  const options = h(
+    'div',
+    { class: 'ml-mcq-options', role: 'radiogroup', 'aria-label': `Pilihan jawaban nomor ${index + 1}` },
+    q.options.map((option, i) => {
+      const input = h('input', { type: 'radio', name: `${phase}-${q.id}`, value: String(i) });
+      input.checked = chosen === i;
+      const pick = () => {
+        if (!input.checked) return;
+        options.querySelectorAll('input').forEach((o) => (o.checked = o === input));
+        store.update((s) => {
+          if (!s.ml[phase].mcqAnswers) s.ml[phase].mcqAnswers = {};
+          s.ml[phase].mcqAnswers[q.id] = i;
+          // uraian dari alur lama: tandai agar pilihan yang sedang diisi tidak dianggap "terkirim bersamaan"
+          if (!s.ml[phase].mcqSeparate) s.ml[phase].mcqLegacyOpen = true;
+        });
+      };
+      input.addEventListener('change', pick);
+      input.addEventListener('click', pick);
+      return h('label', { class: 'ml-mcq-option' }, input, h('span', {}, `${'ABCD'[i] ?? i + 1}. ${option}`));
+    }),
+  );
+
+  return [
+    topBar(phaseLabel(test, phase), `Pilihan ganda ${index + 1}/${mlMcq.length}`),
+    h(
+      'main',
+      { class: 'screen', 'data-mcq-id': q.id },
+      h('div', { class: 'problem ml-problem' }, h('p', {}, q.question)),
+      options,
+      h('p', { class: 'note ml-note' }, 'Pilihan tersimpan otomatis.'),
+    ),
+    h(
+      'nav',
+      { class: 'navbar two', 'aria-label': 'Navigasi pilihan ganda' },
+      h('button', { type: 'button', onClick: () => go(index > 0 ? `#/tes-ml/${phase}/pg/${index - 1}` : `#/tes-ml/${phase}/pg`) }, 'Kembali'),
+      h('button', { type: 'button', class: 'primary', onClick: () => go(last ? `#/tes-ml/${phase}/pg/kirim` : `#/tes-ml/${phase}/pg/${index + 1}`) }, last ? 'Periksa jawaban' : 'Lanjut'),
+    ),
+  ];
+}
+
+export function mlMcqSubmitScreen({ test, phase, store, go }) {
+  const guard = mcqGuard({ test, phase, store, go });
+  if (guard) return guard;
+
+  const main = h('main', { class: 'screen' });
+  const answers = store.get().ml[phase].mcqAnswers ?? {};
+  const empty = mlMcq.map((q, i) => (answers[q.id] === undefined ? i + 1 : null)).filter(Boolean);
+  const list = h(
+    'ul',
+    { class: 'module-list' },
+    mlMcq.map((q, i) =>
+      h('li', {}, h('button', { type: 'button', class: 'module', onClick: () => go(`#/tes-ml/${phase}/pg/${i}`) },
+        h('span', {}, `Pilihan ganda ${i + 1}`),
+        h('span', { class: 'status' }, answers[q.id] === undefined ? 'Belum dipilih' : 'Sudah dipilih ✓'))),
+    ),
+  );
+
+  function send() {
+    const p = store.get().ml[phase];
+    const now = p.mcqAnswers ?? {};
+    if (!mlMcq.some((q) => now[q.id] !== undefined)) return draw(false);
+    store.update((s) => {
+      s.ml[phase].mcqSubmittedAt = new Date().toISOString();
+      // uraian dikirim dengan alur lama (opsi PG sempat tampil di layar uraian)
+      if (!s.ml[phase].mcqSeparate) s.ml[phase].mcqLegacyOpen = true;
+    });
+    logEvent('ml_submit', {
+      module_id: 'ML',
+      payload: { phase, part: 'pg', answered: mlMcq.filter((q) => now[q.id] !== undefined).length, mcqAnswers: { ...now } },
+    });
+    go(`#/tes-ml/${phase}/hasil`);
+  }
+
+  function draw(confirming) {
+    const noAnswer = empty.length === mlMcq.length;
+    fill(
+      main,
+      h('p', {}, 'Periksa lagi pilihanmu. Ketuk nomor untuk mengubahnya.'),
+      list,
+      noAnswer
+        ? feedbackBox('info', null, 'Belum ada pilihan yang dipilih. Pilih jawabanmu dulu, lalu kirim.')
+        : empty.length
+          ? feedbackBox('info', null, `Pilihan ganda nomor ${empty.join(', ')} belum dipilih.`)
+          : null,
+      noAnswer
+        ? null
+        : confirming
+          ? [
+              h('p', {}, h('strong', {}, 'Setelah dikirim, pilihan tidak bisa diubah. Kirim sekarang?')),
+              h('button', { type: 'button', class: 'primary wide', onClick: send }, 'Ya, kirim'),
+              h('button', { type: 'button', class: 'wide', onClick: () => draw(false) }, 'Batal'),
+            ]
+          : h('button', { type: 'button', class: 'primary wide', onClick: () => draw(true) }, 'Kirim pilihan ganda'),
+    );
+  }
+  draw(false);
+  return [topBar(phaseLabel(test, phase), 'Periksa pilihan ganda'), main];
 }
 
 export function mlResultScreen({ test, phase, store, go }) {
   const ml = store.get().ml;
+  // hasil (termasuk kunci PG tes akhir) baru boleh tampil setelah kedua bagian terkirim
+  if (!ml[phase].submittedAt) return mlIntroScreen({ test, phase, store, go });
+  if (!mcqSubmitted(ml[phase])) return mlMcqIntroScreen({ test, phase, store, go });
   const sum = phaseSummary(test, ml[phase]);
   const pre = phaseSummary(test, ml.awal);
   const post = phaseSummary(test, ml.akhir);
@@ -467,9 +569,11 @@ export function mlGraderHome({ test, store, go, download = defaultDownload }) {
           ),
         ),
       ),
-      submitted
-        ? h('p', {}, `Skor pilihan ganda otomatis: ${sum.mcqTotal ?? 0}/${mlMcq.length}`)
-        : null,
+      !submitted
+        ? null
+        : mcqSubmitted(ml[phase])
+          ? h('p', {}, `Skor pilihan ganda otomatis: ${sum.mcqTotal ?? 0}/${mlMcq.length}${isLegacyCombined(ml[phase]) ? ' (alur lama: dikerjakan bersamaan dengan uraian)' : ''}`)
+          : h('p', {}, 'Pilihan ganda: belum dikirim siswa. Uraian sudah bisa dinilai.'),
     );
   };
 
@@ -546,7 +650,7 @@ export function mlGradeScreen({ test, phase, index, store, go }) {
 
     store.update((s) => {
       s.ml[phase].scores[task.id] = draft.slice();
-      if (phaseStatus(test, s.ml[phase]) === 'dinilai') {
+      if (essaysScored(test, s.ml[phase])) {
         s.ml[phase].scoredAt = new Date().toISOString();
       }
     });

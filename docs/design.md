@@ -264,9 +264,10 @@ Salah boleh dicoba lagi; umpan balik hanya mengarahkan (misal "Lihat panah kedua
 
 ### 6.6b Tes literasi (F17)
 
-- Peta belajar: bagian **Tes literasi** (Tes awal · Tes akhir) di atas peta modul; status `Mulai` / `Lanjutkan` / `Terkirim` / `Skor x/24`; tes akhir terbuka setelah tes awal dikirim. Tautan **Penilaian tes (guru/peneliti)** di bawah.
+- Peta belajar: bagian **Tes literasi** (Tes awal · Tes akhir) di atas peta modul; status `Mulai` / `Lanjutkan` / `Lanjutkan pilihan ganda` / `Terkirim` / `Skor x/28`; tes akhir terbuka setelah uraian dan pilihan ganda tes awal dikirim. Tautan **Penilaian tes (guru/peneliti)** di bawah.
 - Soal: bilah atas "Tes awal · Soal 1/4"; teks soal di kartu; daftar pilihan (A/B/C) sebagai butir; kotak jawaban besar; navigasi `Kembali` · `Lanjut` (soal terakhir: `Periksa jawaban`). Tanpa penghitung waktu.
-- Periksa & kirim: daftar soal dengan status "Sudah diisi ✓/Belum diisi"; `Kirim jawaban` → konfirmasi `Ya, kirim` / `Batal`.
+- Periksa & kirim uraian: daftar soal dengan status "Sudah diisi ✓/Belum diisi"; `Kirim jawaban` → konfirmasi `Ya, kirim` / `Batal` → pengantar pilihan ganda.
+- Pilihan ganda (KP-35, hanya setelah uraian terkirim): bilah atas "Pilihan ganda 1/4"; soal di kartu; 4 opsi `A.`–`D.` sebagai kotak pilihan ≥ 48 px (terpilih: isi biru + ✓); `Kembali` · `Lanjut` / `Periksa jawaban`; periksa: "Sudah dipilih ✓/Belum dipilih", peringatan nomor kosong, `Kirim pilihan ganda` → `Ya, kirim`.
 - Hasil siswa: skor total dan tabel Soal · Kemampuan · Skor; tanpa kunci jawaban.
 - Penilai: soal, jawaban siswa, tiap tahap rubrik dengan tombol skor `0 … maks`; `Simpan nilai` aktif setelah semua tahap diisi.
 

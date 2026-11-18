@@ -208,7 +208,7 @@ Mengembalikan kelas, hasil diagnostik terakhir, dan `module_progress` untuk memu
 | `screen_check` | siswa menjawab pertanyaan di layar materi (M2-06: label jenis tabel, lalu "yang tetap") | `{ "table": 0, "question": "jenis", "response": "senilai", "correct": true }` · `question`: `jenis` \| `tetap` (+ `module_id`, `screen_id`) |
 | `gate_locked` | soal mandiri dibuka sebelum lulus cek M2 (DS02) | `{ "gate": "cek_m2" }` (+ `module_id`, `item_id`) |
 | `ml_start` | siswa mulai tes literasi (F17) | `{ "phase": "awal" }` · `phase`: `awal` \| `akhir` (+ `module_id: "ML"`) |
-| `ml_submit` | siswa mengirim tes literasi; jawaban terkunci | `{ "phase": "awal", "answered": 4, "answers": { "ML1": "…" } }` |
+| `ml_submit` | siswa mengirim satu bagian tes literasi; bagian itu terkunci (KP-35) | uraian: `{ "phase": "awal", "part": "uraian", "answered": 4, "answers": { "ML1": "…" } }` · PG: `{ "phase": "awal", "part": "pg", "answered": 3, "mcqAnswers": { "PG1": 1 } }` (indeks opsi 0–3) |
 | `ml_score` | penilai menyimpan skor satu soal | `{ "phase": "awal", "scores": [1, 2, 1, 1, 1], "total": 6 }` (+ `item_id`: `ML1`–`ML4`) |
 | `tutor_open` | siswa membuka panel Tanya Nalls (F18) | `{ "step": 1 }` (+ `module_id`, `item_id`) |
 | `tutor_message` | satu pertanyaan ke Tanya Nalls; **tanpa isi pertanyaan/balasan** | `{ "step": 4, "status": "ok", "tokens": 700 }` · `status`: `ok` \| `guarded` \| `limit_device` \| `limit_busy` \| `limit_day` \| `unavailable` \| `disabled` \| `invalid` · `tokens`: jumlah token dari layanan AI (untuk memantau batas), `null` jika tidak ada |

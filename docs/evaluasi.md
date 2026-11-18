@@ -144,7 +144,7 @@ Disarankan dua penilai menilai sebagian jawaban secara terpisah, lalu mendiskusi
 
 **Tujuan:** menguji apakah Nalls membantu meningkatkan literasi matematis siswa pada materi Perbandingan Senilai dan Berbalik Nilai.
 
-**Instrumen:** 4 soal uraian dari "Tabel 2. Soal dan Kisi-kisi Jawaban Mathematical Literacy" (dokumen tugas, 12 Nov 2026), satu soal per indikator, skor per tahap penyelesaian, maks. 6 per soal, total 24. Teks soal dan rubrik di `src/content/ml-test.json` sama persis dengan dokumen (diperiksa `check_content.py`: jumlah skor tahap = skor maksimum).
+**Instrumen:** 4 soal uraian dari "Tabel 2. Soal dan Kisi-kisi Jawaban Mathematical Literacy" (dokumen tugas, 12 Nov 2026), satu soal per indikator, skor per tahap penyelesaian, maks. 6 per soal, total 24. Teks soal dan rubrik di `src/content/ml-test.json` sama persis dengan dokumen (diperiksa `check_content.py`: jumlah skor tahap = skor maksimum). Ditambah **4 soal pilihan ganda** (`src/content/ml-mcq.json`, 1 poin per soal; struktur, jumlah = jumlah uraian, dan kunci diperiksa `check_content.py` dan `tools/tests`; kunci dihitung ulang dari angka soal). **Skor maksimum 28** (24 uraian + 4 PG).
 
 | Soal | Indikator | Konteks | Tahap (skor) |
 |---|---|---|---|
@@ -156,15 +156,16 @@ Disarankan dua penilai menilai sebagian jawaban secara terpisah, lalu mendiskusi
 **Desain:** tes awal (sebelum M0) dan tes akhir (sesudah modul yang tersedia selesai) dengan soal yang sama (KP-29). Aplikasi mencatat modul yang sudah selesai saat tes dikirim (`modul_selesai_saat_kirim` di CSV) untuk memeriksa urutan.
 
 **Prosedur:**
-1. Siswa memilih kelas, lalu membuka **Tes awal** di peta belajar dan mengerjakan 4 soal (jawaban bebas, tanpa batas waktu), lalu **Kirim**.
+1. Siswa memilih kelas, lalu membuka **Tes awal** di peta belajar, mengerjakan 4 soal **uraian** (jawaban bebas, tanpa batas waktu), lalu **Kirim jawaban**. Setelah itu baru muncul 4 soal **pilihan ganda** di halaman terpisah, satu per layar → **Kirim pilihan ganda** (KP-35).
 2. Guru/peneliti membuka **Penilaian tes (guru/peneliti)** di perangkat yang sama, mengisi **kode peserta** (bukan nama), lalu menilai tiap soal per tahap rubrik.
 3. Siswa belajar dengan Nalls.
-4. Siswa mengerjakan **Tes akhir** (terbuka setelah tes awal dikirim); guru menilai dengan cara yang sama.
-5. Guru menekan **Unduh CSV rinci** (skor tiap tahap + jawaban) dan **Unduh CSV ringkasan** (skor per indikator awal/akhir, total, N-gain). File dibuka di Excel (pemisah `;`).
+4. Siswa mengerjakan **Tes akhir** (terbuka setelah uraian dan pilihan ganda tes awal dikirim), dengan urutan yang sama; guru menilai uraian dengan cara yang sama (PG dinilai otomatis).
+5. Guru menekan **Unduh CSV rinci** (skor tiap tahap + jawaban uraian, jawaban & skor PG, `pg_dikirim`, `urutan_pg`) dan **Unduh CSV ringkasan** (skor per indikator awal/akhir, skor PG, total, N-gain, urutan PG). File dibuka di Excel (pemisah `;`).
 
-**Analisis:** per siswa dan rata-rata kelompok: skor awal, skor akhir, selisih, N-gain = (akhir − awal) / (24 − awal) dengan kategori ≥ 0,7 tinggi, 0,3–< 0,7 sedang, < 0,3 rendah (Hake; KP-28), dan perubahan per indikator. Karena peserta sedikit, hasil dideskripsikan (§8).
+**Analisis:** per siswa dan rata-rata kelompok: skor awal, skor akhir, selisih, N-gain = (akhir − awal) / (28 − awal) dengan total = uraian + PG dengan kategori ≥ 0,7 tinggi, 0,3–< 0,7 sedang, < 0,3 rendah (Hake; KP-28), dan perubahan per indikator. Karena peserta sedikit, hasil dideskripsikan (§8).
 
 **Keterbatasan:**
+- Data uji coba sebelum KP-35 memakai alur lama: opsi PG tampil di layar uraian. Catatan itu tidak dihapus atau diubah; di CSV ditandai `urutan_pg = bersamaan (alur lama)` (atau `setelah uraian (opsi sempat terlihat di alur lama)` bila PG baru dikerjakan sesudahnya) agar bisa dipisahkan saat analisis.
 - Data hanya di perangkat siswa; jika data peramban dihapus sebelum CSV diunduh, hasil hilang. Unduh CSV setelah setiap fase dinilai.
 - Layar penilai tidak dilindungi kata sandi (tanpa server tidak ada perlindungan sungguhan); guru mengawasi agar siswa tidak membukanya.
 - Soal sama di tes awal dan akhir → kemungkinan efek latihan; kunci jawaban tidak pernah ditampilkan ke siswa untuk mengurangi efek ini.

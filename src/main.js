@@ -14,7 +14,11 @@ import {
   afterM2Lesson,
   mandiriLockedScreen,
 } from './screens/m2.js';
-import { mlEntries, mlIntroScreen, mlTaskScreen, mlSubmitScreen, mlResultScreen, mlGraderHome, mlGradeScreen } from './screens/mlTest.js';
+import {
+  mlEntries, mlIntroScreen, mlTaskScreen, mlSubmitScreen, mlResultScreen, mlGraderHome, mlGradeScreen,
+  mlMcqIntroScreen, mlMcqScreen, mlMcqSubmitScreen,
+} from './screens/mlTest.js';
+import mlMcq from './content/ml-mcq.json';
 import { isItemLocked } from './engine/path.js';
 import { PHASES } from './engine/mlScore.js';
 import { store } from './data/store.js';
@@ -86,6 +90,12 @@ function routeMlTest(part, sub, sub2) {
   if (sub === undefined || sub === '') return mlIntroScreen({ ...ctx, phase });
   if (sub === 'kirim') return mlSubmitScreen({ ...ctx, phase });
   if (sub === 'hasil') return mlResultScreen({ ...ctx, phase });
+  // pilihan ganda (KP-35): #/tes-ml/<fase>/pg[/<n>|/kirim] — layar sendiri yang menolak jika uraian belum terkirim
+  if (sub === 'pg') {
+    if (sub2 === undefined || sub2 === '') return mlMcqIntroScreen({ ...ctx, phase });
+    if (sub2 === 'kirim') return mlMcqSubmitScreen({ ...ctx, phase });
+    return mlMcqScreen({ ...ctx, phase, index: clampIndex(sub2, mlMcq.length) });
+  }
   return mlTaskScreen({ ...ctx, phase, index: clampIndex(sub, n) });
 }
 

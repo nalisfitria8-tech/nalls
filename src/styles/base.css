@@ -711,3 +711,45 @@ fieldset.ml-stage legend {
   font-size: var(--fs-body);
   min-width: 0;
 }
+
+/* ---------- Tes literasi: pilihan ganda, halaman terpisah setelah uraian (KP-35) ---------- */
+.ml-mcq-options {
+  display: grid;
+  gap: var(--space-1);
+}
+/* satu pilihan = kotak ≥ 48 px; terpilih = isi biru + ✓ (bukan warna saja) */
+.ml-mcq-option {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border: 2px solid var(--muted);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+}
+.ml-mcq-option input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  flex: none;
+  accent-color: var(--primary);
+}
+.ml-mcq-option:has(input:checked) {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+}
+.ml-mcq-option:has(input:checked) input {
+  accent-color: var(--on-primary);
+}
+.ml-mcq-option:has(input:checked) span::after {
+  content: ' ✓';
+}
+.ml-mcq-option:has(input:focus-visible) {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}

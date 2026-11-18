@@ -264,3 +264,65 @@ def test_tutor_rmt_tanpa_sumber_ditolak():
     bad = _tutor()
     bad["rmt"]["tahapan"] = ["Tahap karangan"]
     assert any("RMT" in e for e in cc.check_tutor(bad))
+
+
+# ---------------------------------------------------------------- pilihan ganda tes literasi (KP-35)
+def _mcq():
+    import json
+    return json.loads((cc.CONTENT_DIR / "ml-mcq.json").read_text(encoding="utf-8"))
+
+
+def test_ml_mcq_proyek_lolos():
+    assert cc.check_ml_mcq(_mcq()) == []
+    assert [q["id"] for q in _mcq()] == ["PG1", "PG2", "PG3", "PG4"]
+
+
+def test_ml_mcq_kunci_dihitung_ulang_dari_angka_soal():
+    """Kunci PG dihitung dari angka di teks soal, lalu dicocokkan dengan opsi pada indeks `answer`."""
+    import re as _re
+    nums = lambda s: [int(x.replace(".", "")) for x in _re.findall(r"\d[\d.]*\d|\d", s)]
+    pg1, pg2, pg3, pg4 = _mcq()
+    # PG1: harga per kg toko A, B, C → termurah
+    a_harga, a_kg, b_harga, b_kg, c_harga, c_kg = nums(pg1["question"])
+    per_kg = {"Toko A": a_harga / a_kg, "Toko B": b_harga / b_kg, "Toko C": c_harga / c_kg}
+    assert pg1["options"][pg1["answer"]] == min(per_kg, key=per_kg.get)
+    # PG2: senilai sirup : air = 3 : 12, air 20 → sirup
+    sirup, air, air_baru = nums(pg2["question"])
+    assert pg2["options"][pg2["answer"]] == f"{sirup * air_baru // air} gelas"
+    # PG3: berbalik nilai "Enam pekerja … 15 hari … 10 orang"
+    hari, pekerja_baru = nums(pg3["question"])
+    assert pg3["options"][pg3["answer"]] == f"{6 * hari // pekerja_baru} hari"
+    # PG4: berbalik nilai "Enam keran … 24 menit … 8 keran"
+    menit, keran_baru = nums(pg4["question"])
+    assert pg4["options"][pg4["answer"]] == f"{6 * menit // keran_baru} menit"
+
+
+def test_ml_mcq_struktur_salah_ditolak():
+    import copy as _copy
+    bad = _copy.deepcopy(_mcq())
+    bad[0]["answer"] = 4
+    bad[1]["options"] = ["3 gelas", "4 gelas", "5 gelas"]
+    bad[2]["options"][1] = bad[2]["options"][0]
+    bad[3]["id"] = "X4"
+    errors = cc.check_ml_mcq(bad)
+    assert any("PG1" in e and "answer" in e for e in errors)
+    assert any("PG2" in e and "4 opsi" in e for e in errors)
+    assert any("PG3" in e and "tidak boleh sama" in e for e in errors)
+    assert any("X4" in e and "PG<nomor>" in e for e in errors)
+    assert cc.check_ml_mcq({"bukan": "daftar"}) == ["ml_mcq: harus berupa daftar soal yang tidak kosong"]
+
+
+def test_ml_mcq_jumlah_harus_sama_dengan_uraian(tmp_path):
+    import json, shutil
+    for f in cc.CONTENT_DIR.glob("*.json"):
+        shutil.copy(f, tmp_path / f.name)
+    data = _mcq()[:3]
+    (tmp_path / "ml-mcq.json").write_text(json.dumps(data), encoding="utf-8")
+    _, errors = cc.check_all(tmp_path)
+    assert any("jumlah soal PG (3)" in e for e in errors)
+
+
+def test_skor_maksimum_tes_literasi_28():
+    import json
+    t = json.loads((cc.CONTENT_DIR / "ml-test.json").read_text(encoding="utf-8"))
+    assert t["maxScore"] + len(_mcq()) == 28  # 24 uraian + 4 PG

@@ -25,10 +25,10 @@ Jika halaman tidak terbuka: periksa Wi-Fi sama, alamat benar (termasuk `:4173`),
 
 ## C. Urutan untuk tugas tes literasi
 
-1. **Tes awal dulu**, sebelum M0 dan modul lain: ketuk **Tes awal**, kerjakan 4 soal, lalu **Kirim jawaban → Ya, kirim**.
+1. **Tes awal dulu**, sebelum M0 dan modul lain: ketuk **Tes awal**, kerjakan 4 soal **uraian**, lalu **Kirim jawaban → Ya, kirim**. Setelah itu muncul 4 soal **pilihan ganda** (satu per layar) → **Kirim pilihan ganda → Ya, kirim**. Tes awal baru selesai setelah kedua bagian terkirim.
 2. Guru menilai: di peta belajar ketuk **Penilaian tes (guru/peneliti)** → isi **Kode peserta** (misal S07, **bukan nama**) → **Nilai soal 1–4**, pilih skor tiap tahap → **Simpan nilai**.
 3. Siswa belajar: M0 → M1 → M2 → M3 → M4.
-4. **Tes akhir**: ketuk **Tes akhir**, kerjakan, kirim. Guru menilai dengan cara yang sama.
+4. **Tes akhir**: ketuk **Tes akhir**, kerjakan uraian lalu pilihan ganda dengan urutan yang sama. Guru menilai uraian dengan cara yang sama; pilihan ganda dinilai otomatis.
 5. Di layar penilai, ketuk **Unduh CSV rinci** dan **Unduh CSV ringkasan**. File masuk ke folder **Download** HP. Kirim file itu ke laptop (kabel, WhatsApp, atau Drive) untuk dianalisis di Excel.
 
 ## D. Hal penting

@@ -364,16 +364,65 @@ def check_ml_test(data: dict) -> list[str]:
     return errors
 
 
+MCQ_OPTIONS = 4
+
+
+def check_ml_mcq(items) -> list[str]:
+    """Soal pilihan ganda tes literasi (ml-mcq.json, daftar). Struktur & kunci menunjuk opsi yang ada.
+    Kunci dihitung ulang dari angka soal di tools/tests (soal cerita bebas tidak bisa dihitung umum)."""
+    errors: list[str] = []
+    if not isinstance(items, list) or not items:
+        return ["ml_mcq: harus berupa daftar soal yang tidak kosong"]
+    ids = [q.get("id") if isinstance(q, dict) else None for q in items]
+    if len(set(ids)) != len(ids):
+        errors.append(f"ml_mcq: ID ganda {ids}")
+    for n, q in enumerate(items, start=1):
+        if not isinstance(q, dict):
+            errors.append(f"ml_mcq: soal ke-{n} bukan objek")
+            continue
+        qid = q.get("id") or f"soal ke-{n}"
+        if not (isinstance(q.get("id"), str) and re.fullmatch(r"PG\d+", q["id"])):
+            errors.append(f"{qid}: id harus berbentuk PG<nomor>")
+        if not (isinstance(q.get("question"), str) and q["question"].strip()):
+            errors.append(f"{qid}: teks soal kosong")
+        opts = q.get("options")
+        if not (isinstance(opts, list) and len(opts) == MCQ_OPTIONS and all(isinstance(o, str) and o.strip() for o in opts)):
+            errors.append(f"{qid}: harus ada {MCQ_OPTIONS} opsi teks yang tidak kosong")
+        elif len(set(o.strip() for o in opts)) != len(opts):
+            errors.append(f"{qid}: opsi tidak boleh sama")
+        ans = q.get("answer")
+        if not (isinstance(ans, int) and not isinstance(ans, bool) and isinstance(opts, list) and 0 <= ans < len(opts)):
+            errors.append(f"{qid}: answer harus indeks opsi 0..{(len(opts) if isinstance(opts, list) else MCQ_OPTIONS) - 1}")
+        extra = set(q) - {"id", "question", "options", "answer"}
+        if extra:
+            errors.append(f"{qid}: kunci tidak dikenal {sorted(extra)}")
+    return errors
+
+
 def check_all(content_dir: Path = CONTENT_DIR) -> tuple[int, list[str]]:
     errors: list[str] = []
     seen: set[str] = set()
     count = 0
+    n_tasks = n_mcq = None
     for path in sorted(content_dir.glob("*.json")):
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
         except json.JSONDecodeError as e:
             errors.append(f"{path.name}: JSON tidak sah ({e})")
             continue
+        # ml-mcq.json: daftar soal pilihan ganda tes literasi (bukan modul)
+        if isinstance(data, list):
+            errors.extend(f"{path.name}: {e}" for e in check_ml_mcq(data))
+            n_mcq = len(data)
+            for q in data:
+                count += 1
+                qid = q.get("id") if isinstance(q, dict) else None
+                if qid in seen:
+                    errors.append(f"{qid}: ID ganda")
+                seen.add(qid)
+            continue
+        if data.get("type") == "ml_test":
+            n_tasks = len(data.get("tasks", []))
         screens = list(data.get("screens", []))
         questions = list(data.get("quiz", []))
         for card in data.get("reminders", {}).values():
@@ -412,6 +461,9 @@ def check_all(content_dir: Path = CONTENT_DIR) -> tuple[int, list[str]]:
                     errors.append(f"{iid}: ID ganda")
                 seen.add(iid)
                 errors.extend(check_identify(item, max_hints))
+    # tes literasi: 4 uraian + 4 PG (skor maks. 24 + 4 = 28, KP-35)
+    if n_tasks is not None and n_mcq is not None and n_tasks != n_mcq:
+        errors.append(f"ml_mcq: jumlah soal PG ({n_mcq}) harus sama dengan jumlah soal uraian ({n_tasks})")
     return count, errors
 
 

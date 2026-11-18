@@ -152,7 +152,7 @@ Disimpan di `localStorage` dengan kunci `mathsave:v1` (nama lama aplikasi; **sen
 | `m2.cek` | percobaan cek pemahaman: `attempt`, `open`, `order`, `answers` (jawaban pertama, dikunci), `result`, `reviewed` (KP-25) |
 | `ml.deviceId`, `ml.participant` | kode acak perangkat (`P-XXXXXX`) dan kode peserta dari penilai (bukan nama) |
 | `tutor` | `{ date, count }`: jumlah pertanyaan Tanya Nalls hari ini (pembatasan sederhana, §12); **tanpa** isi percakapan |
-| `ml.awal`, `ml.akhir` | tes literasi: `answers` (draf/terkirim), `startedAt`, `submittedAt`, `progressAtSubmit`, `scores` (per tahap), `scoredAt` (F17) |
+| `ml.awal`, `ml.akhir` | tes literasi: `answers` (uraian, draf/terkirim), `startedAt`, `submittedAt` (uraian dikirim), `mcqAnswers` (indeks opsi PG), `mcqSubmittedAt` (PG dikirim), `mcqSeparate` (uraian dikirim dengan alur KP-35), `mcqLegacyOpen` (uraian alur lama, PG dikerjakan sesudahnya), `progressAtSubmit`, `scores` (per tahap), `scoredAt` (F17). Data alur lama (uraian + PG terkirim bersamaan) dikenali saat dibaca, **tanpa** diubah (`isLegacyCombined` di `mlScore.js`). |
 
 Skor cek pemahaman (`m2.cek.result.correct`) nanti dikirim ke `module_progress.check_score` (wajib sebelum/bersama C15).
 

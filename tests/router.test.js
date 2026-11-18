@@ -138,13 +138,41 @@ describe('Tes literasi terdaftar di router (main.js)', () => {
     await visit('#/tes-ml/awal/3');
     expect(app().querySelector('.progress').textContent).toBe('Soal 4/4');
     await visit('#/tes-ml/awal/kirim');
-    expect(app().textContent).toContain('Periksa lagi jawabanmu');
+    expect(app().textContent).toContain('Periksa lagi jawaban uraianmu');
+    // PG lewat alamat langsung sebelum uraian dikirim → kembali ke uraian, tanpa opsi PG
+    for (const hash of ['#/tes-ml/awal/pg', '#/tes-ml/awal/pg/2', '#/tes-ml/awal/pg/kirim']) {
+      await visit(hash);
+      expect(app().querySelector('label.ml-mcq-option'), hash).toBeNull();
+      expect(app().querySelector('textarea'), hash).not.toBeNull();
+    }
+    await visit('#/tes-ml/awal/hasil'); // hasil sebelum dikirim → pengantar, tanpa opsi PG
+    expect(app().querySelector('label.ml-mcq-option')).toBeNull();
+    expect(app().textContent).not.toContain('Jawabanmu sudah terkirim');
+    await visit('#/tes-ml/awal/0');
+    // kirim uraian → pengantar PG → PG 1..4 → periksa PG
+    app().querySelector('textarea').value = 'jawaban';
+    app().querySelector('textarea').dispatchEvent(new Event('input'));
+    await visit('#/tes-ml/awal/kirim');
+    [...app().querySelectorAll('button')].find((b) => b.textContent === 'Kirim jawaban').click();
+    [...app().querySelectorAll('button')].find((b) => b.textContent === 'Ya, kirim').click();
+    window.dispatchEvent(new Event('hashchange'));
+    expect(location.hash).toBe('#/tes-ml/awal/pg');
+    expect(app().textContent).toContain('Sekarang kerjakan 4 soal pilihan ganda');
+    await visit('#/tes-ml/awal/pg/3');
+    expect(app().querySelector('.progress').textContent).toBe('Pilihan ganda 4/4');
+    expect(app().querySelectorAll('label.ml-mcq-option')).toHaveLength(4);
+    await visit('#/tes-ml/awal/pg/9');
+    expect(app().querySelector('.progress').textContent).toBe('Pilihan ganda 4/4'); // nomor dibatasi
+    await visit('#/tes-ml/awal/pg/kirim');
+    expect(app().textContent).toContain('Periksa lagi pilihanmu');
     await visit('#/tes-ml/akhir');
-    expect(app().textContent).toContain('Kerjakan tes awal dulu');
+    expect(app().textContent).toContain('Kerjakan tes awal dulu'); // PG tes awal belum dikirim
     await visit('#/tes-ml/penilai');
     expect(title()).toBe('Penilaian tes literasi');
     await visit('#/tes-ml/penilai/awal/0');
-    expect(app().textContent).toContain('Tes awal belum dikirim siswa');
+    expect(app().querySelector('.ml-student-answer').textContent).toBe('jawaban'); // uraian sudah bisa dinilai
+    await visit('#/tes-ml/penilai/akhir/0');
+    expect(app().textContent).toContain('Tes akhir belum dikirim siswa');
     await visit('#/tes-ml/salah');
     expect(title()).toBe('Nalls'); // fase tidak dikenal → peta belajar
   });

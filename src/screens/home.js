@@ -31,7 +31,7 @@ export function gradeScreen({ onPick }) {
   ];
 }
 
-const ML_STATUS = { belum: 'Mulai', mengerjakan: 'Lanjutkan', terkirim: 'Terkirim' };
+const ML_STATUS = { belum: 'Mulai', mengerjakan: 'Lanjutkan', pg: 'Lanjutkan pilihan ganda', terkirim: 'Terkirim' };
 
 /** Tombol tes literasi (F17). tests = hasil mlEntries() dari screens/mlTest.js */
 function mlTestList(tests, go) {
