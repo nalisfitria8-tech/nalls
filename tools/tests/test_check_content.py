@@ -234,3 +234,33 @@ def test_konten_tes_literasi_proyek():
     assert [t["maxScore"] for t in data["tasks"]] == [6, 6, 6, 6]
     assert data["maxScore"] == 24
     assert [[st["score"] for st in t["stages"]] for t in data["tasks"]] == [[1, 2, 1, 1, 1], [1] * 6, [1, 2, 2, 1], [1] * 6]
+
+
+def _tutor():
+    import json
+    return json.loads((cc.CONTENT_DIR / "tutor.json").read_text(encoding="utf-8"))
+
+
+def test_tutor_proyek_lolos():
+    assert cc.check_tutor(_tutor()) == []
+
+
+def test_tutor_tidak_boleh_di_fase_mandiri():
+    bad = _tutor()
+    bad["settings"]["phases"].append("mandiri")
+    assert any("mandiri" in e for e in cc.check_tutor(bad))
+
+
+def test_tutor_pesan_panjang_dan_istilah_teori():
+    bad = _tutor()
+    bad["messages"]["limitDay"] = "kata " * 41
+    bad["fallbackByStep"]["jenis"] = "Ini untuk mengurangi beban kognitif kamu."
+    errors = cc.check_tutor(bad)
+    assert any("limitDay" in e and "40 kata" in e for e in errors)
+    assert any("fallback.jenis" in e and "teori belajar" in e for e in errors)
+
+
+def test_tutor_rmt_tanpa_sumber_ditolak():
+    bad = _tutor()
+    bad["rmt"]["tahapan"] = ["Tahap karangan"]
+    assert any("RMT" in e for e in cc.check_tutor(bad))

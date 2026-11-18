@@ -298,6 +298,40 @@ def check_label_tables(screen: dict) -> list[str]:
     return errors
 
 
+TUTOR_STEPS = ["diketahui", "ditanya", "jenis", "hitung"]
+TUTOR_MESSAGES = ["intro", "invalid", "limitDevice", "limitBusy", "limitDay", "unavailable", "disabled"]
+LEARNING_THEORY_TERMS = ["cognitive", "kognitif", "clt", "intrinsic", "extraneous", "germane", "beban"]
+
+
+def check_tutor(data: dict) -> list[str]:
+    """Chatbot Tanya Nalls (F18): aturan, pesan untuk siswa, dan wadah RMT."""
+    errors: list[str] = []
+    s = data.get("settings", {})
+    for key in ["dailyPerDevice", "maxMessageChars", "maxReplyWords", "historyTurns"]:
+        if not (isinstance(s.get(key), int) and s[key] > 0):
+            errors.append(f"tutor: settings.{key} harus bilangan bulat positif")
+    if "mandiri" in s.get("phases", []) or "akhir" in s.get("phases", []):
+        errors.append("tutor: chatbot tidak boleh aktif di fase mandiri/akhir")
+    if not data.get("rules"):
+        errors.append("tutor: rules kosong")
+    for group in ["stepFocus", "fallbackByStep"]:
+        if list(data.get(group, {}).keys()) != TUTOR_STEPS:
+            errors.append(f"tutor: {group} harus berisi {TUTOR_STEPS}")
+    shown = {**data.get("messages", {}), **{f"fallback.{k}": v for k, v in data.get("fallbackByStep", {}).items()}}
+    for key in TUTOR_MESSAGES:
+        if not data.get("messages", {}).get(key):
+            errors.append(f"tutor: pesan '{key}' kosong")
+    for key, text in shown.items():
+        if len(text.split()) > 40:
+            errors.append(f"tutor: pesan '{key}' lebih dari 40 kata")
+        if any(term in text.lower() for term in LEARNING_THEORY_TERMS):
+            errors.append(f"tutor: pesan '{key}' memuat istilah teori belajar")
+    rmt = data.get("rmt", {})
+    if rmt.get("tahapan") and not rmt.get("sumber"):
+        errors.append("tutor: tahapan RMT diisi tanpa sumber resmi dari dosen")
+    return errors
+
+
 def check_ml_test(data: dict) -> list[str]:
     """Tes literasi: rubrik per tahap harus konsisten dengan skor maksimum."""
     errors: list[str] = []
@@ -364,6 +398,9 @@ def check_all(content_dir: Path = CONTENT_DIR) -> tuple[int, list[str]]:
                 if t.get("id") in seen:
                     errors.append(f"{t.get('id')}: ID ganda")
                 seen.add(t.get("id"))
+
+        if data.get("type") == "tutor":
+            errors.extend(check_tutor(data))
 
         if any(key in data for key in IDENTIFY_LISTS):
             errors.extend(check_identify_module(data))

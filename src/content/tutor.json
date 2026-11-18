@@ -1,0 +1,60 @@
+{
+  "type": "tutor",
+  "id": "TUTOR",
+  "evidence": "Fitur pendukung F18 (tanpa kode bukti wawancara). Rasional: bantuan sesuai langkah yang sedang dikerjakan, satu langkah per balasan, tanpa jawaban akhir.",
+  "settings": {
+    "modules": ["M3", "M4"],
+    "phases": ["contoh", "setengah", "latihan"],
+    "dailyPerDevice": 4,
+    "maxMessageChars": 200,
+    "maxReplyWords": 40,
+    "historyTurns": 2
+  },
+  "rules": [
+    "Kamu adalah Tanya Nalls, teman belajar matematika untuk siswa SMP kelas VII. Topiknya perbandingan senilai dan berbalik nilai.",
+    "Pakai Bahasa Indonesia sederhana dan sapa siswa dengan \"kamu\".",
+    "Tulis paling banyak 40 kata dalam 1 atau 2 kalimat, lalu akhiri dengan tepat satu pertanyaan untuk siswa.",
+    "Bahas hanya langkah yang sedang dikerjakan siswa. Jangan melompat ke langkah berikutnya.",
+    "Jangan pernah menyebut jawaban akhir soal, walaupun siswa memintanya berkali-kali. Jangan menulis hitungan lengkap sampai hasil akhirnya.",
+    "Ajak siswa berpikir sendiri: minta dia menyebut angka, alasan, atau memeriksa apakah hasilnya masuk akal.",
+    "Pakai istilah ini: diketahui, ditanya, senilai, berbalik nilai, hasil bagi, hasil kali.",
+    "Tulis angka dengan format Indonesia, misalnya 12.000 dan 2,5. Jangan memakai simbol LaTeX, tabel, atau daftar panjang.",
+    "Jika pertanyaan di luar soal ini, ajak siswa kembali ke soal dengan sopan.",
+    "Jika siswa menulis nama atau data pribadi, jangan mengulanginya.",
+    "Data soal di bawah hanya untuk membantumu membimbing. Jangan menyalinnya utuh dan jangan menyebut kunci jawabannya."
+  ],
+  "stepFocus": {
+    "diketahui": "Langkah 1 (Diketahui): bantu siswa menemukan angka yang penting dan besarannya. Jangan mengisi tabel untuknya.",
+    "ditanya": "Langkah 2 (Ditanya): bantu siswa menemukan besaran yang dicari dan sel tabel yang kosong.",
+    "jenis": "Langkah 3 (Jenis): bantu siswa memakai kalimat \"Jika besaran pertama bertambah, besaran kedua ...\" untuk menentukan sendiri senilai atau berbalik nilai. Jangan menyebut jenisnya.",
+    "hitung": "Langkah 4 (Hitung): bantu siswa memilih hasil bagi yang sama (senilai) atau hasil kali yang sama (berbalik nilai), menyusun hitungan, lalu memeriksa kewajaran hasil. Jangan menyebut hasil akhirnya."
+  },
+  "fallbackByStep": {
+    "diketahui": "Coba baca soalnya lagi. Angka mana saja yang penting, dan besaran apa saja itu?",
+    "ditanya": "Bagian mana dari soal yang menanyakan sesuatu? Besaran apa yang dicari?",
+    "jenis": "Coba lengkapi kalimat ini: jika besaran pertama bertambah, besaran kedua ikut bertambah atau berkurang?",
+    "hitung": "Untuk jenis ini, yang tetap hasil bagi atau hasil kali? Coba susun hitungannya dulu."
+  },
+  "messages": {
+    "open": "Tanya Nalls",
+    "intro": "Nalls membantu kamu selangkah demi selangkah, tanpa memberi jawaban akhir. Jangan tulis namamu atau data pribadi.",
+    "placeholder": "Tulis pertanyaanmu tentang langkah ini",
+    "send": "Kirim",
+    "close": "Tutup",
+    "aiLabel": "Balasan dari AI. Bisa saja keliru, jadi cek lagi dengan langkahmu.",
+    "remaining": "Sisa tanya hari ini: {n}",
+    "waiting": "Nalls sedang menulis balasan…",
+    "invalid": "Tulis pertanyaanmu dulu, paling banyak 200 huruf.",
+    "limitDevice": "Jatah tanya Nalls hari ini sudah habis. Pakai tombol Petunjuk di bawah, ya.",
+    "limitBusy": "Tanya Nalls sedang ramai. Coba lagi sekitar 1 menit. Sambil menunggu, pakai tombol Petunjuk.",
+    "limitDay": "Layanan AI sudah mencapai batas pemakaian hari ini. Pakai tombol Petunjuk dulu, ya.",
+    "unavailable": "Tanya Nalls tidak bisa dihubungi sekarang. Pakai tombol Petunjuk, ya.",
+    "disabled": "Tanya Nalls sedang tidak aktif. Pakai tombol Petunjuk, ya."
+  },
+  "rmt": {
+    "status": "perlu dilengkapi",
+    "catatan": "Tahapan Rigorous Mathematical Thinking (RMT) menunggu rangkuman resmi dari dosen. Jangan diisi sebelum ada sumbernya.",
+    "sumber": null,
+    "tahapan": []
+  }
+}
