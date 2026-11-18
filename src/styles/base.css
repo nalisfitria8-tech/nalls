@@ -667,3 +667,47 @@ fieldset.ml-stage legend {
 .note.ml-note {
   font-size: var(--fs-body);
 }
+
+/* ---------- Tanya Nalls (F18, fase terbimbing M3–M4) ---------- */
+.tutor {
+  display: grid;
+  gap: var(--space-1);
+}
+.tutor:has(.tutor-head) {
+  background: var(--card);
+  border: 1px solid var(--accent);
+  border-left: 4px solid var(--violet);
+  border-radius: var(--radius);
+  padding: var(--space-1) var(--space-2) var(--space-2);
+}
+.tutor-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-1);
+}
+.tutor-head .link {
+  font-size: var(--fs-body);
+}
+.tutor-turn {
+  display: grid;
+  gap: var(--space-1);
+}
+.tutor-question,
+.tutor-reply {
+  margin: 0;
+}
+.tutor-reply {
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+}
+.tutor-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-1);
+}
+.tutor-form .tutor-input {
+  font-size: var(--fs-body);
+  min-width: 0;
+}

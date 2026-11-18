@@ -38,6 +38,8 @@ const empty = () => ({
     awal: emptyPhase(),
     akhir: emptyPhase(),
   },
+  // Tanya Nalls: hanya hitungan pemakaian hari ini (tanpa isi percakapan). Pembatasan sederhana per perangkat.
+  tutor: { date: null, count: 0 },
 });
 
 function merge(saved) {

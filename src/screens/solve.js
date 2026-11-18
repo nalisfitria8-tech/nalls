@@ -17,6 +17,10 @@ import { maxHintLevel, registerWrong } from '../engine/hints.js';
 import { formatNumber, parseNumber } from '../engine/number.js';
 import { emptyCells, placeNumber, clearCell, cellsToResponse } from '../engine/marking.js';
 import { logStep, logHint, logEvent } from '../data/logger.js';
+import { tutorPanel, sendTutorRequest } from '../components/tutor.js';
+import { tutorAllowed } from '../engine/tutorPolicy.js';
+import { store } from '../data/store.js';
+import tutorContent from '../content/tutor.json';
 
 const STEP_NAMES = ['Diketahui', 'Ditanya', 'Jenis', 'Hitung'];
 
@@ -45,10 +49,20 @@ export function initialState(item) {
   return s;
 }
 
-export function solveScreen({ lesson, index, recallCard, go, onFinish }) {
+export function solveScreen({ lesson, index, recallCard, go, onFinish, tutorSend = sendTutorRequest }) {
   const items = lesson.items;
   let item = items[index];
   let s = initialState(item);
+  // Tanya Nalls (F18): hanya fase terbimbing M3–M4, bukan soal kembar (angkanya beda dari data server)
+  const tutor = tutorAllowed(tutorContent.settings, lesson.module, item)
+    ? tutorPanel({
+        tutor: tutorContent,
+        moduleId: lesson.module,
+        store,
+        send: tutorSend,
+        context: () => ({ item, step: s.step, errorType: s.lastError, hintLevel: s.hint }),
+      })
+    : null;
   const container = h('div', { class: 'solve' });
   const isLast = index === items.length - 1;
   const nextHash = () => (isLast ? null : `#/soal/${lesson.module}/${index + 1}`);
@@ -71,6 +85,7 @@ export function solveScreen({ lesson, index, recallCard, go, onFinish }) {
   }
 
   function wrong(errorType) {
+    s.lastError = errorType; // konteks untuk Tanya Nalls
     const r = registerWrong(phase(), s, max());
     Object.assign(s, { hint: r.hint, wrong: r.wrong, wrongAtMax: r.wrongAtMax });
     if (r.showSolution) {
@@ -397,6 +412,7 @@ export function solveScreen({ lesson, index, recallCard, go, onFinish }) {
             } }, 'ⓘ Ingat lagi: cara menentukan jenis')
           : null,
         recallView(),
+        tutor && inStep && !item.isTwin ? tutor.el : null,
         inStep ? hintBox({ hints: item.hints || [], level: s.hint, max: max(), onMore: () => {
           s.hint += 1;
           logHint({ item_id: item.id, step: `langkah${s.step}`, level: s.hint });
