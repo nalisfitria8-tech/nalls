@@ -266,6 +266,8 @@ Sampai langkah ini selesai, kelas dipilih di layar awal (versi pengembangan). De
 - Folder `referensi/` tidak ikut di-deploy dan dikecualikan dari git lewat `.gitignore` (transkrip memuat data pribadi).
 - Persetujuan orang tua/wali dan siswa dikumpulkan di luar aplikasi sebelum uji coba.
 - Kunci layanan AI (`GROQ_API_KEY`) hanya di variabel lingkungan server Netlify, tidak di repo atau browser; isi percakapan Tanya Nalls tidak disimpan (§12).
+- **Header keamanan** (`netlify.toml`, dijaga `tests/security-headers.test.js`): CSP hanya situs sendiri (tanpa skrip inline/eval, tanpa situs luar, tidak bisa disematkan), `nosniff`, `X-Frame-Options: DENY`, `no-referrer`, tanpa izin kamera/mikrofon/lokasi.
+- **Audit dependensi (`npm audit`, 18 Nov 2026):** dependensi produksi **0** (berkas situs tidak memuat paket pihak ketiga). Temuan (8; 3 kritis) hanya pada **alat pengembangan** (vite, vitest, happy-dom) dan perbaikannya butuh versi mayor. Uji coba di salinan terpisah: versi terbaru tetap menyisakan 5 temuan "high" (picomatch, belum ada perbaikan hulu) dan 2 tes diagnostik gagal di happy-dom 21, jadi **belum dinaikkan**. Mitigasi: situs Netlify hanya menjalankan `vite build` (tanpa server pengembangan); jangan menjalankan `npm run dev`/`npm run preview` (memakai `--host`) di Wi-Fi publik; untuk kelas pakai situs Netlify. Ditinjau ulang setelah pengumpulan.
 
 ## 11. Keputusan yang masih terbuka
 
